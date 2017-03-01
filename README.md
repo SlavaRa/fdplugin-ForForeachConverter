@@ -5,4 +5,4 @@ ForForeachConverter plugin for [FlashDevelop](http://www.flashdevelop.org)/[Haxe
 
 ### Installation
 
-Download [the latest release](https://github.com/SlavaRa/fdplugin-ForForeachConverter/releases). Open the .fdz file with FlashDevelop.
+Download [the latest release](https://github.com/SlavaRa/fdplugin-ForForeachConverter/releases). Open the .fdz file with FlashDevelop/HaxeDevelop.
