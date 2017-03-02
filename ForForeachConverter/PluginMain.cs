@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using PluginCore;
 using PluginCore.Helpers;
+using PluginCore.Managers;
 using PluginCore.Utilities;
 
 namespace ForForeachConverter
@@ -41,6 +43,18 @@ namespace ForForeachConverter
         /// </summary>
         public void HandleEvent(object sender, NotifyEvent e, HandlingPriority priority)
         {
+            switch (e.Type)
+            {
+                case EventType.Command:
+                    var de = (DataEvent) e;
+                    switch (de.Action)
+                    {
+                        case "ASCompletion.ContextualGenerator.AddOptions":
+                            OnAddRefactorOptions(de.Data as List<ICompletionListItem>);
+                            break;
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -66,13 +80,16 @@ namespace ForForeachConverter
         /// <summary>
         /// Adds the required event handlers
         /// </summary>
-        void AddEventHandlers()
-        {
-        }
+        void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.Command);
 
         /// <summary>
         /// Saves the plugin settings
         /// </summary>
         void SaveSettings() => ObjectSerializer.Serialize(settingFilename, Settings);
+
+        void OnAddRefactorOptions(List<ICompletionListItem> list)
+        {
+            //throw new System.NotImplementedException();
+        }
     }
 }
