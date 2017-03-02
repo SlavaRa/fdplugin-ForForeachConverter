@@ -89,7 +89,10 @@ namespace ForForeachConverter
 
         void OnAddRefactorOptions(List<ICompletionListItem> list)
         {
-            //throw new System.NotImplementedException();
+            var document = PluginBase.MainForm.CurrentDocument;
+            if (!document.IsEditable) return;
+            var sci = document.SciControl;
+            //TODO slavara: проверить доступность команд и добавить в список доступные
         }
     }
 }
