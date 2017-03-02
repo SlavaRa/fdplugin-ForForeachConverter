@@ -9,9 +9,6 @@ namespace ForForeachConverter.Provider
 
     class CommandFactory : ICommandFactory
     {
-        public Command CreateForToForeachCommand()
-        {
-            return new ForToForeachCommand();
-        }
+        public Command CreateForeachToForCommand() => new ForeachToForCommand();
     }
 }

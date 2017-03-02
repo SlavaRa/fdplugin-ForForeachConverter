@@ -5,7 +5,7 @@ using PluginCore.FRService;
 
 namespace ForForeachConverter.Commands
 {
-    class ForToForeachCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
+    class ForeachToForCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
     {
         protected override void ExecutionImplementation()
         {

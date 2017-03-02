@@ -45,6 +45,10 @@
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Commands\ForToForeachCommand.cs" />
+    <Compile Include="Provider\CommandFactory.cs" />
+    <Compile Include="Provider\CommandFactoryProvider.cs" />
+    <Compile Include="Provider\ICommandFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -8,6 +8,6 @@ namespace ForForeachConverter.Provider
 
     interface ICommandFactory
     {
-        Command CreateForToForeachCommand();
+        Command CreateForeachToForCommand();
     }
 }
