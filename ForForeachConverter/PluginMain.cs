@@ -6,6 +6,7 @@ using PluginCore;
 using PluginCore.Helpers;
 using PluginCore.Managers;
 using PluginCore.Utilities;
+using ScintillaNet;
 using CommandFactoryProvider = ForForeachConverter.Provider.CommandFactoryProvider;
 
 namespace ForForeachConverter
@@ -90,7 +91,8 @@ namespace ForForeachConverter
         void CreateMenuItems()
         {
             refactorMainMenu = new RefactorMenu();
-            refactorMainMenu.ConvertToFor.Click += ConvertToForOnClick;
+            refactorMainMenu.ConvertForeachToFor.Click += ConvertForeachToForOnClick;
+            CompletionMenuProvider.Menu = refactorMainMenu;
         }
 
         /// <summary>
@@ -100,13 +102,11 @@ namespace ForForeachConverter
 
         static void OnAddRefactorOptions(List<ICompletionListItem> list)
         {
-            var document = PluginBase.MainForm.CurrentDocument;
-            if (!document.IsEditable) return;
-            var sci = document.SciControl;
-            //TODO slavara: проверить доступность команд и добавить в список доступные
+            var doc = PluginBase.MainForm.CurrentDocument;
+            if (doc.IsEditable) list.AddRange(CompletionMenuProvider.GetItems(doc.SciControl));
         }
 
-        static void ConvertToForOnClick(object sender, EventArgs eventArgs)
+        static void ConvertForeachToForOnClick(object sender, EventArgs eventArgs)
         {
             try
             {
@@ -118,6 +118,19 @@ namespace ForForeachConverter
             {
                 ErrorManager.ShowError(e);
             }
+        }
+    }
+
+    class CompletionMenuProvider
+    {
+        public static RefactorMenu Menu;
+
+        public static List<ICompletionListItem> GetItems(ScintillaControl sci)
+        {
+            var result = new List<ICompletionListItem>();
+            var factory = CommandFactoryProvider.GetFactoryForCurrentDocument();
+            if (factory.IsValidForConvertForeachToFor(sci)) result.Add(new RefactorCompletionItem(Menu.ConvertForeachToFor));
+            return result;
         }
     }
 }

@@ -53,7 +53,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\ForeachToForCommand.cs" />
+    <Compile Include="Commands\AS3\ConvertForeachToForCommand.cs" />
     <Compile Include="Controls\RefactorCompletionItem.cs" />
     <Compile Include="Controls\RefactorMenu.cs" />
     <Compile Include="PluginMain.cs" />
