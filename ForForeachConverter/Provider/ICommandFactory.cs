@@ -6,8 +6,8 @@ namespace ForForeachConverter.Provider
 {
     using Command = RefactorCommand<IDictionary<string, List<SearchMatch>>>;
 
-    interface ICommandFactory
+    public interface ICommandFactory
     {
-        Command CreateForeachToForCommand();
+        Command CreateConvertForeachToForCommand();
     }
 }

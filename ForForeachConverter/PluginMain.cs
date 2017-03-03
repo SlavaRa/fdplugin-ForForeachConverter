@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using ForForeachConverter.Controls;
 using PluginCore;
 using PluginCore.Helpers;
 using PluginCore.Managers;
 using PluginCore.Utilities;
+using CommandFactoryProvider = ForForeachConverter.Provider.CommandFactoryProvider;
 
 namespace ForForeachConverter
 {
     public class PluginMain : IPlugin
     {
         string settingFilename;
+        RefactorMenu refactorMainMenu;
 
         #region Required Properties
 
@@ -30,6 +34,7 @@ namespace ForForeachConverter
         {
             InitBasics();
             LoadSettings();
+            CreateMenuItems();
             AddEventHandlers();
         }
 
@@ -78,21 +83,41 @@ namespace ForForeachConverter
         }
 
         /// <summary>
-        /// Adds the required event handlers
-        /// </summary>
-        void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.Command);
-
-        /// <summary>
         /// Saves the plugin settings
         /// </summary>
         void SaveSettings() => ObjectSerializer.Serialize(settingFilename, Settings);
 
-        void OnAddRefactorOptions(List<ICompletionListItem> list)
+        void CreateMenuItems()
+        {
+            refactorMainMenu = new RefactorMenu();
+            refactorMainMenu.ConvertToFor.Click += ConvertToForOnClick;
+        }
+
+        /// <summary>
+        /// Adds the required event handlers
+        /// </summary>
+        void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.Command);
+
+        static void OnAddRefactorOptions(List<ICompletionListItem> list)
         {
             var document = PluginBase.MainForm.CurrentDocument;
             if (!document.IsEditable) return;
             var sci = document.SciControl;
             //TODO slavara: проверить доступность команд и добавить в список доступные
+        }
+
+        static void ConvertToForOnClick(object sender, EventArgs eventArgs)
+        {
+            try
+            {
+                CommandFactoryProvider.GetFactoryForCurrentDocument()
+                    .CreateConvertForeachToForCommand()
+                    .Execute();
+            }
+            catch (Exception e)
+            {
+                ErrorManager.ShowError(e);
+            }
         }
     }
 }
