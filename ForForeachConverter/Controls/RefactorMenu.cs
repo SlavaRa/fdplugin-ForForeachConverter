@@ -6,11 +6,11 @@ namespace ForForeachConverter.Controls
     {
         public RefactorMenu()
         {
-            ConvertToFor = new ToolStripMenuItem("for");
+            ConvertForeachToFor = new ToolStripMenuItem("for");
             ConvertToForeach = new ToolStripMenuItem("foreach");
         }
 
-        public ToolStripMenuItem ConvertToFor { get; private set; }
+        public ToolStripMenuItem ConvertForeachToFor { get; private set; }
         public ToolStripMenuItem ConvertToForeach { private set; get; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CodeRefactor.Commands;
-using ForForeachConverter.Commands;
 using ForForeachConverter.Commands.AS3;
 using PluginCore.FRService;
 using ScintillaNet;
