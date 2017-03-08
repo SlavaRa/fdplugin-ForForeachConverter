@@ -138,6 +138,9 @@ namespace ForForeachConverter.Completion
                         new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}")
                             .Returns("for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}".Length);
                     yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:String) {\n\t} catch(e:*) {}")
+                            .Returns("for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:String) {\n\t} catch(e:*) {}".Length);
+                    yield return
                         new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}\n\t finally {\n\t\t//some comment...\n\t}")
                             .Returns("for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}\n\t finally {\n\t\t//some comment...\n\t}".Length);
 
