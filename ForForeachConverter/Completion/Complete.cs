@@ -57,24 +57,21 @@ namespace ForForeachConverter.Completion
                         var p = pos;
                         while (p < endPosition)
                         {
-                            if (!sci.PositionIsOnComment(p))
+                            if (!sci.PositionIsOnComment(p) && characterClass.IndexOf((char) sci.CharAt(p)) != -1)
                             {
-                                if (characterClass.IndexOf((char) sci.CharAt(p)) != -1)
+                                var word = sci.GetWordRight(p, false);
+                                if (word == "else")
                                 {
-                                    var word = sci.GetWordRight(p, false);
-                                    if (word == "else")
+                                    pos = p + word.Length;
+                                    word = sci.GetWordRight(pos, true);
+                                    if (word == "if")
                                     {
-                                        pos = p + word.Length;
-                                        word = sci.GetWordRight(pos, true);
-                                        if (word == "if")
-                                        {
-                                            pos = sci.WordStartPosition(pos + word.Length, false);
-                                            return GetStartOfIFStatement(sci, pos);
-                                        }
-                                        break;
+                                        pos = sci.WordStartPosition(pos + word.Length, false);
+                                        return GetStartOfIFStatement(sci, pos);
                                     }
-                                    return pos;
+                                    break;
                                 }
+                                return pos;
                             }
                             p++;
                         }
