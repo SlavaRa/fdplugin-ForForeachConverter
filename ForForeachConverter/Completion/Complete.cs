@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using ASCompletion.Completion;
 using ASCompletion.Context;
 using ForForeachConverter.Helpers;
