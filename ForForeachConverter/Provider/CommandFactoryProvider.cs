@@ -7,8 +7,8 @@ namespace ForForeachConverter.Provider
 {
     public static class CommandFactoryProvider
     {
-        public static readonly CodeRefactor.Provider.ICommandFactory DefaultFactory = new CodeRefactor.Provider.CommandFactory();
-        static readonly Dictionary<string, CodeRefactor.Provider.ICommandFactory> LanguageToFactory = new Dictionary<string, CodeRefactor.Provider.ICommandFactory>();
+        public static readonly ICommandFactory DefaultFactory = new CommandFactory();
+        static readonly Dictionary<string, ICommandFactory> LanguageToFactory = new Dictionary<string, ICommandFactory>();
 
         static CommandFactoryProvider()
         {
@@ -16,7 +16,7 @@ namespace ForForeachConverter.Provider
             Register("haxe", DefaultFactory);
         }
 
-        public static void Register(string language, CodeRefactor.Provider.ICommandFactory factory)
+        public static void Register(string language, ICommandFactory factory)
         {
             if (ContainsLanguage(language)) LanguageToFactory.Remove(language);
             LanguageToFactory.Add(language, factory);
@@ -27,31 +27,30 @@ namespace ForForeachConverter.Provider
             return LanguageToFactory.ContainsKey(language);
         }
 
-        public static CodeRefactor.Provider.ICommandFactory GetFactoryFromCurrentDocument()
+        public static ICommandFactory GetFactoryForCurrentDocument()
         {
             var document = PluginBase.MainForm.CurrentDocument;
             if (document == null || !document.IsEditable) return null;
-            return GetFactoryFromDocument(document);
+            return GetFactory(document);
         }
 
-        public static CodeRefactor.Provider.ICommandFactory GetFactoryFromDocument(ITabbedDocument document)
+        public static ICommandFactory GetFactory(ITabbedDocument document)
         {
-            var language = document.SciControl.ConfigurationLanguage;
-            return GetFactoryFromLanguage(language);
+            return GetFactory(document.SciControl.ConfigurationLanguage);
         }
 
-        public static CodeRefactor.Provider.ICommandFactory GetFactoryFromTarget(ASResult target)
+        public static ICommandFactory GetFactory(ASResult target)
         {
-            return GetFactoryFromFile(target.InFile ?? target.Type.InFile);
+            return GetFactory(target.InFile ?? target.Type.InFile);
         }
 
-        public static CodeRefactor.Provider.ICommandFactory GetFactoryFromFile(FileModel file)
+        public static ICommandFactory GetFactory(FileModel file)
         {
             var language = PluginBase.MainForm.SciConfig.GetLanguageFromFile(file.FileName);
-            return GetFactoryFromLanguage(language);
+            return GetFactory(language);
         }
 
-        public static CodeRefactor.Provider.ICommandFactory GetFactoryFromLanguage(string language)
+        public static ICommandFactory GetFactory(string language)
         {
             return LanguageToFactory[language];
         }

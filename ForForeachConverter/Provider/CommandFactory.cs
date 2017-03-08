@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using CodeRefactor.Commands;
-using ForForeachConverter.Commands;
+using ForForeachConverter.Commands.AS3;
 using PluginCore.FRService;
+using ScintillaNet;
 
 namespace ForForeachConverter.Provider
 {
@@ -9,6 +10,8 @@ namespace ForForeachConverter.Provider
 
     class CommandFactory : ICommandFactory
     {
-        public Command CreateForeachToForCommand() => new ForeachToForCommand();
+        public bool IsValidForConvertForeachToFor(ScintillaControl sci) => ConvertForeachToForCommand.IsValidForConvert(sci);
+
+        public Command CreateConvertForeachToForCommand() => new ConvertForeachToForCommand();
     }
 }

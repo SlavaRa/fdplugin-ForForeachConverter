@@ -1,15 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using ForForeachConverter.Controls;
 using PluginCore;
 using PluginCore.Helpers;
 using PluginCore.Managers;
 using PluginCore.Utilities;
+using ScintillaNet;
+using CommandFactoryProvider = ForForeachConverter.Provider.CommandFactoryProvider;
 
 namespace ForForeachConverter
 {
     public class PluginMain : IPlugin
     {
         string settingFilename;
+        RefactorMenu refactorMainMenu;
 
         #region Required Properties
 
@@ -30,6 +35,7 @@ namespace ForForeachConverter
         {
             InitBasics();
             LoadSettings();
+            CreateMenuItems();
             AddEventHandlers();
         }
 
@@ -78,22 +84,53 @@ namespace ForForeachConverter
         }
 
         /// <summary>
-        /// Adds the required event handlers
-        /// </summary>
-        void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.Command);
-
-        /// <summary>
         /// Saves the plugin settings
         /// </summary>
         void SaveSettings() => ObjectSerializer.Serialize(settingFilename, Settings);
 
-        void OnAddRefactorOptions(List<ICompletionListItem> list)
+        void CreateMenuItems()
         {
-            if (list == null) return;
-            var document = PluginBase.MainForm.CurrentDocument;
-            if (!document.IsEditable) return;
-            var sci = document.SciControl;
-            //TODO slavara: проверить доступность команд и добавить в список доступные
+            refactorMainMenu = new RefactorMenu();
+            refactorMainMenu.ConvertForeachToFor.Click += ConvertForeachToForOnClick;
+            CompletionMenuProvider.Menu = refactorMainMenu;
+        }
+
+        /// <summary>
+        /// Adds the required event handlers
+        /// </summary>
+        void AddEventHandlers() => EventManager.AddEventHandler(this, EventType.Command);
+
+        static void OnAddRefactorOptions(List<ICompletionListItem> list)
+        {
+            var doc = PluginBase.MainForm.CurrentDocument;
+            if (doc.IsEditable) list.AddRange(CompletionMenuProvider.GetItems(doc.SciControl));
+        }
+
+        static void ConvertForeachToForOnClick(object sender, EventArgs eventArgs)
+        {
+            try
+            {
+                CommandFactoryProvider.GetFactoryForCurrentDocument()
+                    .CreateConvertForeachToForCommand()
+                    .Execute();
+            }
+            catch (Exception e)
+            {
+                ErrorManager.ShowError(e);
+            }
+        }
+    }
+
+    class CompletionMenuProvider
+    {
+        public static RefactorMenu Menu;
+
+        public static List<ICompletionListItem> GetItems(ScintillaControl sci)
+        {
+            var result = new List<ICompletionListItem>();
+            var factory = CommandFactoryProvider.GetFactoryForCurrentDocument();
+            if (factory.IsValidForConvertForeachToFor(sci)) result.Add(new RefactorCompletionItem(Menu.ConvertForeachToFor));
+            return result;
         }
     }
 }

@@ -88,6 +88,7 @@ namespace FlashDevelop
 
         public DockContent OpenEditableDocument(string file, bool restoreFileState)
         {
+            if (CurrentDocument != null && CurrentDocument.FileName == file) return CurrentDocument as DockContent;
             throw new NotImplementedException();
         }
 
@@ -152,11 +153,6 @@ namespace FlashDevelop
             throw new NotImplementedException();
         }
 
-        Color IMainForm.GetThemeColor(string id)
-        {
-            return GetThemeColor(id);
-        }
-
         public Color GetThemeColor(string id)
         {
             return Color.Black;
@@ -206,7 +202,7 @@ namespace FlashDevelop
         public Image ImageSetAdjust(Image image)
         {
             imageSetAdjustCount++;
-            return image;            
+            return image;
         }
 
         public Image GetAutoAdjustedImage(Image image)
@@ -217,31 +213,6 @@ namespace FlashDevelop
         public Image FindImage(string data)
         {
             return null;
-        }
-
-        Image IMainForm.FindImage(string data, bool autoAdjust)
-        {
-            return FindImage(data, autoAdjust);
-        }
-
-        Image IMainForm.FindImage16(string data)
-        {
-            return FindImage16(data);
-        }
-
-        Image IMainForm.FindImage16(string data, bool autoAdjusted)
-        {
-            return FindImage16(data, autoAdjusted);
-        }
-
-        Image IMainForm.FindImageAndSetAdjust(string data)
-        {
-            return FindImageAndSetAdjust(data);
-        }
-
-        Image IMainForm.FindImage(string data)
-        {
-            return FindImage(data);
         }
 
         public Image FindImage(string data, bool autoAdjust)
@@ -349,11 +320,9 @@ namespace FlashDevelop
             set { _currentDocument = value; }
         }
 
-        ITabbedDocument[] tabbedDocuments;
         public ITabbedDocument[] Documents
         {
-            get { return tabbedDocuments; }
-            set { tabbedDocuments = value; }
+            get { throw new NotImplementedException(); }
         }
 
         public bool HasModifiedDocuments
@@ -443,6 +412,5 @@ namespace FlashDevelop
         {
             get { throw new NotImplementedException(); }
         }
-
     }
 }
