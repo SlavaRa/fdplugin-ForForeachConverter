@@ -98,6 +98,70 @@ namespace ForForeachConverter.Completion
         }
 
         [TestFixture]
+        public class GetEndOfStatementTests : CompleteTests
+        {
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get
+                {
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {}) {}")
+                            .Returns("for each(var it:* in {}) {}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {}) trace(it);")
+                            .Returns("for each(var it:* in {}) trace(it);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tif(it != null) trace(it);")
+                            .Returns("for each(var it:* in {})\n\tif(it != null) trace(it);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tfor(var field:* in it)\n\ttrace(field);")
+                            .Returns("for each(var it:* in {})\n\tfor(var field:* in it)\n\ttrace(field);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tfor(var i:int = 0; i < 10; i++)\n\ttrace(field + i);")
+                            .Returns("for each(var it:* in {})\n\tfor(var i:int = 0; i < 10; i++)\n\ttrace(field + i);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tfor each(var v:* in it)\n\ttrace(v);")
+                            .Returns("for each(var it:* in {})\n\tfor each(var v:* in it)\n\ttrace(v);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\twhile(it != null)\n\ttrace(it);")
+                            .Returns("for each(var it:* in {})\n\twhile(it != null)\n\ttrace(it);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tswitch(it) {\n\t\tcase null: break;\n\t\tdefault: trace(it);\n\t}")
+                            .Returns("for each(var it:* in {})\n\tswitch(it) {\n\t\tcase null: break;\n\t\tdefault: trace(it);\n\t}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tdo {trace(it);}\n\twhile(it != null);")
+                            .Returns("for each(var it:* in {})\n\tdo {trace(it);}\n\twhile(it != null);".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t} catch(e:*) {}")
+                            .Returns("for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t} catch(e:*) {}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}")
+                            .Returns("for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}\n\t finally {\n\t\t//some comment...\n\t}")
+                            .Returns("for each(var it:* in {})\n\ttry {\n\t\ttrace(it);\n\t}\n\t catch(e:*) {}\n\t finally {\n\t\t//some comment...\n\t}".Length);
+
+                }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public int AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static int ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                return Common(sourceText, sci);
+            }
+
+            static int Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                return Complete.GetEndOfStatement(sci, sci.CurrentPos);
+            }
+        }
+
+        [TestFixture]
         public class GetExpressionTests : CompleteTests
         {
             

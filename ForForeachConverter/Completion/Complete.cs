@@ -1,8 +1,10 @@
 ﻿using System.Text;
 using ASCompletion.Completion;
 using ASCompletion.Context;
+using ForForeachConverter.Helpers;
 using PluginCore.Managers;
 using ScintillaNet;
+using ScintillaNet.Enums;
 
 namespace ForForeachConverter.Completion
 {
@@ -21,6 +23,82 @@ namespace ForForeachConverter.Completion
                     pos = sci.WordStartPosition(pos, true) - 1;
                     if (sci.GetWordLeft(pos, true) == "for") return sci.WordStartPosition(pos, true);
                     break;
+            }
+            return -1;
+        }
+
+        public static int GetEndOfStatement(ScintillaControl sci, int startPosition)
+        {
+            var parCount = 0;
+            var parseBody = false;
+            var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
+            var word = string.Empty;
+            var endPosition = sci.TextLength;
+            var pos = startPosition;
+            while (pos < endPosition)
+            {
+                if (!sci.PositionIsOnComment(pos))
+                {
+                    var c = (char)sci.CharAt(pos);
+                    if (parseBody)
+                    {
+                        if (c == '{')
+                        {
+                            if (word == "catch")
+                            {
+                                pos = Reflector.ASGenerator.GetEndOfStatement(pos - 1, endPosition, sci);
+                                return pos == endPosition ? pos : GetEndOfStatement(sci, pos);
+                            }
+                            return Reflector.ASGenerator.GetEndOfStatement(pos - 1, endPosition, sci);
+                        }
+                        if (c > ' ')
+                        {
+                            if (characterClass.IndexOf(c) != -1)
+                            {
+                                word = sci.GetWordRight(pos, false);
+                                switch (word)
+                                {
+                                    case "if":
+                                    case "for":
+                                    case "while":
+                                    case "switch":
+                                        pos += word.Length;
+                                        return GetEndOfStatement(sci, pos);
+                                    case "do":
+                                    case "try":
+                                    case "catch":
+                                    case "finally":
+                                        pos += word.Length;
+                                        pos = Reflector.ASGenerator.GetEndOfStatement(pos, endPosition, sci);
+                                        return pos == endPosition ? pos : GetEndOfStatement(sci, pos);
+                                    default:
+                                        pos += word.Length;
+                                        return Reflector.ASGenerator.GetEndOfStatement(pos, endPosition, sci);
+                                }
+                            }
+                            if (c == ';') return pos + 1;
+                        }
+                    }
+                    else
+                    {
+                        if (characterClass.IndexOf(c) != -1)
+                        {
+                            if (string.IsNullOrEmpty(word)) word = sci.GetWordRight(pos, false);
+                            if (word == "finally")
+                            {
+                                pos += word.Length;
+                                parseBody = true;
+                            }
+                        }
+                        else if (c == '(') parCount++;
+                        else if (c == ')')
+                        {
+                            parCount--;
+                            if (parCount == 0) parseBody = true;
+                        }
+                    }
+                }
+                pos++;
             }
             return -1;
         }
