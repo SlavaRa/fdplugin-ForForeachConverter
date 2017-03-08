@@ -7,7 +7,7 @@
     <ProjectGuid>{C41F6870-EDAF-4175-8C64-A67259C9BB35}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ForForeachConverter.Tests</RootNamespace>
+    <RootNamespace>ForForeachConverter</RootNamespace>
     <AssemblyName>ForForeachConverter.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -17,10 +17,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\FlashDevelop\Bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,17 +32,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NSubstitute">
+      <HintPath>..\..\..\..\packages\NSubstitute.1.10.0.0\lib\net35\NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Completion\CompleteTests.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -49,6 +52,8 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestUtils\ContextExtensions.cs" />
+    <Compile Include="TestUtils\TestFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -63,9 +68,25 @@
       <Project>{61885F70-B4DC-4B44-852D-5D6D03F2A734}</Project>
       <Name>PluginCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\AS2Context\AS2Context.csproj">
+      <Project>{74ad0487-cef9-43fe-9283-bc6f79539ade}</Project>
+      <Name>AS2Context</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AS3Context\AS3Context.csproj">
+      <Project>{0263e5f6-d5b2-4118-b12e-87f9a74de8af}</Project>
+      <Name>AS3Context</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ASCompletion\ASCompletion.csproj">
       <Project>{4EBF2653-9654-4E40-880E-0046B3D6210E}</Project>
       <Name>ASCompletion</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HaXeContext\HaXeContext.csproj">
+      <Project>{5b4e9515-994a-4da7-9916-cda8fd874701}</Project>
+      <Name>HaXeContext</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ForForeachConverter\ForForeachConverter.csproj">
+      <Project>{d489ff4c-f61a-4184-bec7-0f2686728ed2}</Project>
+      <Name>ForForeachConverter</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

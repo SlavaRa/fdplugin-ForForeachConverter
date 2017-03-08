@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AS3\ConvertForeachToForCommand.cs" />
+    <Compile Include="Completion\Complete.cs" />
     <Compile Include="Controls\RefactorCompletionItem.cs" />
     <Compile Include="Controls\RefactorMenu.cs" />
     <Compile Include="PluginMain.cs" />
