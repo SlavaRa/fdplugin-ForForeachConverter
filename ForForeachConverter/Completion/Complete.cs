@@ -66,8 +66,6 @@ namespace ForForeachConverter.Completion
                                         return GetEndOfStatement(sci, pos);
                                     case "do":
                                     case "try":
-                                    case "catch":
-                                    case "finally":
                                         pos += word.Length;
                                         pos = Reflector.ASGenerator.GetEndOfStatement(pos, endPosition, sci);
                                         return pos == endPosition ? pos : GetEndOfStatement(sci, pos);
