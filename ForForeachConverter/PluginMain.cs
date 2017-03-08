@@ -89,6 +89,7 @@ namespace ForForeachConverter
 
         void OnAddRefactorOptions(List<ICompletionListItem> list)
         {
+            if (list == null) return;
             var document = PluginBase.MainForm.CurrentDocument;
             if (!document.IsEditable) return;
             var sci = document.SciControl;
