@@ -114,6 +114,9 @@ namespace ForForeachConverter.Completion
                         new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tif(it != null) trace(it);")
                             .Returns("for each(var it:* in {})\n\tif(it != null) trace(it);".Length);
                     yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tif(it != null) trace(it);\n\telse trace(it);")
+                            .Returns("for each(var it:* in {})\n\tif(it != null) trace(it);\n\telse trace(it);".Length);
+                    yield return
                         new TestCaseData("$(EntryPoint)for each(var it:* in {})\n\tfor(var field:* in it)\n\ttrace(field);")
                             .Returns("for each(var it:* in {})\n\tfor(var field:* in it)\n\ttrace(field);".Length);
                     yield return
@@ -161,6 +164,57 @@ namespace ForForeachConverter.Completion
                 sci.Text = sourceText;
                 SnippetHelper.PostProcessSnippets(sci, 0);
                 return Complete.GetEndOfStatement(sci, sci.CurrentPos);
+            }
+        }
+
+        [TestFixture]
+        public class GetStartOfIFStatementTests : CompleteTests
+        {
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get
+                {
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true) {}")
+                            .Returns("if(true) {}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true) {}\n\telse {}")
+                            .Returns("if(true) {}\n\telse {}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true) trace('')\n\telse {}")
+                            .Returns("if(true) trace('')\n\telse {}".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true) trace('')\n\telse trace('')")
+                            .Returns("if(true) trace('')\n\telse trace('')".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true) trace('')\n\telse if(false) trace('')")
+                            .Returns("if(true) trace('')\n\telse if(false) trace('')".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(a == 1) trace('')\n\telse if(a == 2) trace('')\n\t else if(a == 3) {}\n\t else {}\n\t//some code here...")
+                            .Returns("if(a == 1) trace('')\n\telse if(a == 2) trace('')\n\t else if(a == 3) {}\n\t else {}\n".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true)\n\tfor(var i:int = 0; i < 10; i++) trace(i)")
+                            .Returns("if(true)\n\tfor(var i:int = 0; i < 10; i++) trace(i)".Length);
+                    yield return
+                        new TestCaseData("$(EntryPoint)if(true)\n\tif(true) trace(i)")
+                            .Returns("if(true)\n\tif(true) trace(i)".Length);
+                }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public int AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static int ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                return Common(sourceText, sci);
+            }
+
+            static int Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                return Complete.GetStartOfIFStatement(sci, sci.CurrentPos);
             }
         }
 
