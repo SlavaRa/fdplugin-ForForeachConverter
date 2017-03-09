@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-using System.Text;
+
 using ASCompletion.Completion;
-using ASCompletion.Context;
 using ForForeachConverter.Helpers;
-using PluginCore.Managers;
 using ScintillaNet;
 
 namespace ForForeachConverter.Completion
@@ -157,6 +155,7 @@ namespace ForForeachConverter.Completion
 
         public static ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
         {
+            var result = new ASResult();
             var parCount = 0;
             var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
             var endPosition = sci.TextLength;
@@ -174,40 +173,22 @@ namespace ForForeachConverter.Completion
                             var word = sci.GetWordRight(pos, true);
                             if (word == "var") pos += word.Length + 1;
                             pos = sci.WordEndPosition(pos, true);
-                            var result = ASComplete.GetExpressionType(sci, pos);
+                            result = ASComplete.GetExpressionType(sci, pos);
+                            break;
                         }
                     }
                 }
                 pos++;
             }
-            return null;
-        }
-
-        public static EForeach GetExpression(ScintillaControl sci, int position)
-        {
-            var result = new EForeach {StartPosition = GetStartOfStatement(sci, position), EndPosition = GetEndOfStatement(sci, position)};
-            var owner = ASContext.Context.GetDeclarationAtLine(sci.CurrentLine);
-            var endOfOwner = sci.PositionFromLine(owner.Member.LineTo);
-            var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
-            var parBraces = 0;
-            var sb = new StringBuilder();
-            for (var i = result.StartPosition; i < endOfOwner; i++)
-            {
-                var c = (char)sci.CharAt(i);
-                if (c == '(') parBraces++;
-                else if (c == ')')
-                {
-                    parBraces--;
-                    if (parBraces == 0)
-                    {
-                        TraceManager.Add(sb.ToString());
-                        break;
-                    }
-                }
-                else if (parBraces > 0) sb.Append(c);
-            }
             return result;
         }
+
+        public static EForeach GetExpression(ScintillaControl sci, int position) => new EForeach
+        {
+            StartPosition = GetStartOfStatement(sci, position),
+            EndPosition = GetEndOfStatement(sci, position),
+            Variable = GetVarOfForeachStatement(sci, position)
+        };
 
         static int GetStartOfBody(ScintillaControl sci, int startPosition)
         {
