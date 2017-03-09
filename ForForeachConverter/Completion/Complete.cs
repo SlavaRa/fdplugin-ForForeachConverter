@@ -26,61 +26,6 @@ namespace ForForeachConverter.Completion
             return -1;
         }
 
-        public static int GetStartOfIFStatement(ScintillaControl sci, int startPosition)
-        {
-            var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
-            var endPosition = sci.TextLength;
-            var pos = GetStartOfBody(sci, startPosition);
-            while (pos < endPosition)
-            {
-                if (!sci.PositionIsOnComment(pos))
-                {
-                    var c = (char) sci.CharAt(pos);
-                    if (c > ' ' && (characterClass.IndexOf(c) != -1 || c == '{'))
-                    {
-                        if (c != '{')
-                        {
-                            var word = sci.GetWordRight(pos, true);
-                            switch (word)
-                            {
-                                case "for":
-                                case "while":
-                                case "do":
-                                case "switch":
-                                case "try":
-                                    return GetEndOfStatement(sci, pos + word.Length);
-                            }
-                        }
-                        pos = Reflector.ASGenerator.GetEndOfStatement(pos - 1, endPosition, sci);
-                        if (pos == endPosition) return pos;
-                        var p = pos;
-                        while (p < endPosition)
-                        {
-                            if (!sci.PositionIsOnComment(p) && characterClass.IndexOf((char) sci.CharAt(p)) != -1)
-                            {
-                                var word = sci.GetWordRight(p, false);
-                                if (word == "else")
-                                {
-                                    pos = p + word.Length;
-                                    word = sci.GetWordRight(pos, true);
-                                    if (word == "if")
-                                    {
-                                        pos = sci.WordStartPosition(pos + word.Length, false);
-                                        return GetStartOfIFStatement(sci, pos);
-                                    }
-                                    break;
-                                }
-                                return pos;
-                            }
-                            p++;
-                        }
-                    }
-                }
-                pos++;
-            }
-            return -1;
-        }
-
         public static int GetEndOfStatement(ScintillaControl sci, int startPosition)
         {
             var parCount = 0;
@@ -146,6 +91,61 @@ namespace ForForeachConverter.Completion
                     {
                         parCount--;
                         if (parCount == 0) parseBody = true;
+                    }
+                }
+                pos++;
+            }
+            return -1;
+        }
+
+        public static int GetStartOfIFStatement(ScintillaControl sci, int startPosition)
+        {
+            var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
+            var endPosition = sci.TextLength;
+            var pos = GetStartOfBody(sci, startPosition);
+            while (pos < endPosition)
+            {
+                if (!sci.PositionIsOnComment(pos))
+                {
+                    var c = (char) sci.CharAt(pos);
+                    if (c > ' ' && (characterClass.IndexOf(c) != -1 || c == '{'))
+                    {
+                        if (c != '{')
+                        {
+                            var word = sci.GetWordRight(pos, true);
+                            switch (word)
+                            {
+                                case "for":
+                                case "while":
+                                case "do":
+                                case "switch":
+                                case "try":
+                                    return GetEndOfStatement(sci, pos + word.Length);
+                            }
+                        }
+                        pos = Reflector.ASGenerator.GetEndOfStatement(pos - 1, endPosition, sci);
+                        if (pos == endPosition) return pos;
+                        var p = pos;
+                        while (p < endPosition)
+                        {
+                            if (!sci.PositionIsOnComment(p) && characterClass.IndexOf((char) sci.CharAt(p)) != -1)
+                            {
+                                var word = sci.GetWordRight(p, false);
+                                if (word == "else")
+                                {
+                                    pos = p + word.Length;
+                                    word = sci.GetWordRight(pos, true);
+                                    if (word == "if")
+                                    {
+                                        pos = sci.WordStartPosition(pos + word.Length, false);
+                                        return GetStartOfIFStatement(sci, pos);
+                                    }
+                                    break;
+                                }
+                                return pos;
+                            }
+                            p++;
+                        }
                     }
                 }
                 pos++;
