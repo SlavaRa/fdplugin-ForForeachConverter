@@ -155,31 +155,37 @@ namespace ForForeachConverter.Completion
             return -1;
         }
 
-        static int GetStartOfBody(ScintillaControl sci, int startPosition)
+        public static ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
         {
             var parCount = 0;
-            var pos = startPosition;
+            var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
             var endPosition = sci.TextLength;
+            var pos = startPosition;
             while (pos < endPosition)
             {
                 if (!sci.PositionIsOnComment(pos))
                 {
                     var c = (char)sci.CharAt(pos);
-                    if (c == '(') parCount++;
-                    else if (c == ')')
+                    if (c > ' ')
                     {
-                        parCount--;
-                        if (parCount == 0) break;
+                        if (parCount == 0 && c == '(') parCount++;
+                        else if (parCount == 1 && characterClass.IndexOf(c) != -1)
+                        {
+                            var word = sci.GetWordRight(pos, true);
+                            if (word == "var") pos += word.Length + 1;
+                            pos = sci.WordEndPosition(pos, true);
+                            var result = ASComplete.GetExpressionType(sci, pos);
+                        }
                     }
                 }
                 pos++;
             }
-            return pos;
+            return null;
         }
 
         public static EForeach GetExpression(ScintillaControl sci, int position)
         {
-            var result = new EForeach {StartPosition = GetStartOfStatement(sci, position)};
+            var result = new EForeach {StartPosition = GetStartOfStatement(sci, position), EndPosition = GetEndOfStatement(sci, position)};
             var owner = ASContext.Context.GetDeclarationAtLine(sci.CurrentLine);
             var endOfOwner = sci.PositionFromLine(owner.Member.LineTo);
             var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
@@ -201,6 +207,28 @@ namespace ForForeachConverter.Completion
                 else if (parBraces > 0) sb.Append(c);
             }
             return result;
+        }
+
+        static int GetStartOfBody(ScintillaControl sci, int startPosition)
+        {
+            var parCount = 0;
+            var pos = startPosition;
+            var endPosition = sci.TextLength;
+            while (pos < endPosition)
+            {
+                if (!sci.PositionIsOnComment(pos))
+                {
+                    var c = (char)sci.CharAt(pos);
+                    if (c == '(') parCount++;
+                    else if (c == ')')
+                    {
+                        parCount--;
+                        if (parCount == 0) break;
+                    }
+                }
+                pos++;
+            }
+            return pos;
         }
 
         public struct EForeach

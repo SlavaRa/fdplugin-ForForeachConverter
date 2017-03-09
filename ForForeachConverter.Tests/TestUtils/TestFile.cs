@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace ForForeachConverter.Tests.TestUtils
+namespace ForForeachConverter.TestUtils
 {
     class TestFile : IDisposable
     {

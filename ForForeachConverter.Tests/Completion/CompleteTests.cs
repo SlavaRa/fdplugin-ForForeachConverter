@@ -1,9 +1,17 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using ASCompletion;
+using ASCompletion.Completion;
+using ASCompletion.Context;
+using ASCompletion.Model;
+using ASCompletion.Settings;
 using FlashDevelop;
-using ForForeachConverter.Tests.TestUtils;
+using ForForeachConverter.TestUtils;
 using NSubstitute;
+using NSubstitute.Core;
 using NUnit.Framework;
 using PluginCore;
 using PluginCore.Helpers;
@@ -36,6 +44,16 @@ namespace ForForeachConverter.Completion
             mainForm.StandaloneMode = true;
             PluginBase.Initialize(mainForm);
             FlashDevelop.Managers.ScintillaManager.LoadConfiguration();
+            var pluginMain = Substitute.For<ASCompletion.PluginMain>();
+            var pluginUI = new PluginUI(pluginMain);
+            pluginMain.MenuItems.Returns(new List<System.Windows.Forms.ToolStripItem>());
+            pluginMain.Settings.Returns(new GeneralSettings());
+            pluginMain.Panel.Returns(pluginUI);
+            #region ASContext.GlobalInit(pluginMain);
+            var method = typeof(ASContext).GetMethod("GlobalInit", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+            method.Invoke(null, new[] { pluginMain });
+            #endregion
+            ASContext.Context = Substitute.For<IASContext>();
             Sci = GetBaseScintillaControl();
             doc.SciControl.Returns(Sci);
         }
@@ -217,6 +235,37 @@ namespace ForForeachConverter.Completion
                 sci.Text = sourceText;
                 SnippetHelper.PostProcessSnippets(sci, 0);
                 return Complete.GetStartOfIFStatement(sci, sci.CurrentPos);
+            }
+        }
+
+        [TestFixture]
+        public class GetVarOfForeachStatementTests : CompleteTests
+        {
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get { yield return new TestCaseData("$(EntryPoint)for each(var it:Number in [1,2,3]){}").Returns(null); }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public ASResult AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static ASResult ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                ASContext.Context.SetAS3Features();
+                return Common(sourceText, sci);
+            }
+
+            static ASResult Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                var currentModel = ASContext.Context.CurrentModel;
+                new ASFileParser().ParseSrc(currentModel, sci.Text);
+                var currentClass = currentModel.Classes.FirstOrDefault() ?? ClassModel.VoidClass;
+                ASContext.Context.CurrentClass.Returns(currentClass);
+                ASContext.Context.CurrentMember.Returns(currentClass.Members.Items.FirstOrDefault());
+                return Complete.GetVarOfForeachStatement(sci, sci.CurrentPos);
             }
         }
 

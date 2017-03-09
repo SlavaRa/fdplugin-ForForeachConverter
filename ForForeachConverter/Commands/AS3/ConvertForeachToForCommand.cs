@@ -28,7 +28,7 @@ namespace ForForeachConverter.Commands.AS3
         {
             var sci = PluginBase.MainForm.CurrentDocument.SciControl;
             var expr = Complete.GetExpression(sci, sci.CurrentPos);
-            sci.SetSel(expr.StartPosition, expr.StartPosition);
+            sci.SetSel(expr.StartPosition, expr.EndPosition);
         }
     }
 }

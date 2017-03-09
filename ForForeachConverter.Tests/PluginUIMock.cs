@@ -1,6 +1,6 @@
 ﻿using ASCompletion;
 
-namespace ForForeachConverter.Tests
+namespace ForForeachConverter
 {
     internal class PluginUIMock : PluginUI
     {
