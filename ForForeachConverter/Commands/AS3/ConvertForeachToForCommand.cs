@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using ASCompletion.Completion;
 using ASCompletion.Context;
 using CodeRefactor.Commands;
-using ForForeachConverter.Completion;
+using ForForeachConverter.Completion.AS3;
 using ForForeachConverter.Helpers;
 using PluginCore;
 using PluginCore.FRService;

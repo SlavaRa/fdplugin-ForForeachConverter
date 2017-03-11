@@ -5,7 +5,7 @@ using ASCompletion.Completion;
 using ForForeachConverter.Helpers;
 using ScintillaNet;
 
-namespace ForForeachConverter.Completion
+namespace ForForeachConverter.Completion.AS3
 {
     public static class Complete
     {

@@ -13,6 +13,7 @@ using ASCompletion.Model;
 using ASCompletion.Settings;
 using FlashDevelop;
 using FlashDevelop.Managers;
+using ForForeachConverter.Completion.AS3;
 using ForForeachConverter.TestUtils;
 using NSubstitute;
 using NUnit.Framework;
