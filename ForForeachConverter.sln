@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForForeachConverter", "ForForeachConverter\ForForeachConverter.csproj", "{D489FF4C-F61A-4184-BEC7-0F2686728ED2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForForeachConverter.Tests", "ForForeachConvert.Tests\ForForeachConverter.Tests.csproj", "{C41F6870-EDAF-4175-8C64-A67259C9BB35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForForeachConverter.Tests", "ForForeachConverter.Tests\ForForeachConverter.Tests.csproj", "{C41F6870-EDAF-4175-8C64-A67259C9BB35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
