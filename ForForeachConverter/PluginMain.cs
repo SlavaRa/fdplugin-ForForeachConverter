@@ -105,7 +105,10 @@ namespace ForForeachConverter
         static void OnAddRefactorOptions(List<ICompletionListItem> list)
         {
             var doc = PluginBase.MainForm.CurrentDocument;
-            if (doc.IsEditable) list.AddRange(CompletionMenuProvider.GetItems(doc.SciControl));
+            if (!doc.IsEditable) return;
+            var sci = doc.SciControl;
+            if (CommandFactoryProvider.ContainsLanguage(sci.ConfigurationLanguage))
+                list.AddRange(CompletionMenuProvider.GetItems(sci));
         }
 
         static void ConvertForeachToForOnClick(object sender, EventArgs eventArgs)
