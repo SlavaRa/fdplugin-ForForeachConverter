@@ -1,7 +1,6 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -33,8 +32,7 @@ namespace ForForeachConverter.Helpers
         /// </summary>
         internal string GetSnippet(string word, string syntax, Encoding current)
         {
-            var assembly = Assembly.GetEntryAssembly();
-            var type = assembly.GetType("FlashDevelop.Managers.SnippetManager");
+            var type = Assembly.GetEntryAssembly().GetType("FlashDevelop.Managers.SnippetManager");
             Debug.Assert(type != null, "type is null");
             var methodInfo = type.GetMethod("GetSnippet", BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
             Debug.Assert(methodInfo != null, "methodInfo is null");
