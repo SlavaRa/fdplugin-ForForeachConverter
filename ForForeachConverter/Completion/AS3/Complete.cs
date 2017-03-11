@@ -4,7 +4,7 @@ using ScintillaNet;
 
 namespace ForForeachConverter.Completion.AS3
 {
-    public static class Complete
+    public class Complete
     {
         public static int GetStartOfStatement(ScintillaControl sci, int startPosition)
         {
