@@ -243,20 +243,29 @@ namespace ForForeachConverter.Completion
         {
             public IEnumerable<TestCaseData> AS3TestCases
             {
-                get { yield return new TestCaseData("$(EntryPoint)for each(var it:Number in [1,2,3]){}").Returns(null); }
+                get
+                {
+                    yield return
+                        new TestCaseData("$(EntryPoint)for each(var it:Number in [1,2,3]){}").Returns(new MemberModel
+                        {
+                            Name = "it",
+                            Flags = FlagType.Dynamic | FlagType.Variable,
+                            Type = "Number"
+                        });
+                }
             }
 
             [Test, TestCaseSource(nameof(AS3TestCases))]
-            public ASResult AS3(string sourceText) => ImplAS3(sourceText, Sci);
+            public MemberModel AS3(string sourceText) => ImplAS3(sourceText, Sci);
 
-            static ASResult ImplAS3(string sourceText, ScintillaControl sci)
+            static MemberModel ImplAS3(string sourceText, ScintillaControl sci)
             {
                 sci.ConfigurationLanguage = "as3";
                 ASContext.Context.SetAS3Features();
                 return Common(sourceText, sci);
             }
 
-            static ASResult Common(string sourceText, ScintillaControl sci)
+            static MemberModel Common(string sourceText, ScintillaControl sci)
             {
                 sci.Text = sourceText;
                 SnippetHelper.PostProcessSnippets(sci, 0);
@@ -265,7 +274,8 @@ namespace ForForeachConverter.Completion
                 var currentClass = currentModel.Classes.FirstOrDefault() ?? ClassModel.VoidClass;
                 ASContext.Context.CurrentClass.Returns(currentClass);
                 ASContext.Context.CurrentMember.Returns(currentClass.Members.Items.FirstOrDefault());
-                return Complete.GetVarOfForeachStatement(sci, sci.CurrentPos);
+                var result = Complete.GetVarOfForeachStatement(sci, sci.CurrentPos);
+                return result.Member;
             }
         }
 
