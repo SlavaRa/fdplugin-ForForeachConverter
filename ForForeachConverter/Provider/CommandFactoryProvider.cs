@@ -15,7 +15,7 @@ namespace ForForeachConverter.Provider
         static CommandFactoryProvider()
         {
             Register("as3", new AS3.CommandFactory());
-            Register("haxe", DefaultFactory);
+            Register("haxe", new Haxe.CommandFactory());
         }
 
         public static void Register(string language, ICommandFactory factory)
