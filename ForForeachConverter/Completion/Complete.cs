@@ -11,19 +11,20 @@ namespace ForForeachConverter.Completion
     {
         public static int GetStartOfStatement(ScintillaControl sci, int startPosition)
         {
+            var result = -1;
             var pos = startPosition;
             switch (sci.GetWordFromPosition(pos))
             {
                 case "for":
                     pos = sci.WordEndPosition(pos, true);
-                    if (sci.GetWordRight(pos + 1, true) == "each") return sci.WordStartPosition(startPosition, true);
+                    if (sci.GetWordRight(pos + 1, true) == "each") result = sci.WordStartPosition(startPosition, true);
                     break;
                 case "each":
                     pos = sci.WordStartPosition(pos, true) - 1;
-                    if (sci.GetWordLeft(pos, true) == "for") return sci.WordStartPosition(pos, true);
+                    if (sci.GetWordLeft(pos, true) == "for") result = sci.WordStartPosition(pos, true);
                     break;
             }
-            return -1;
+            return result;
         }
 
         public static int GetEndOfStatement(ScintillaControl sci, int startPosition)
@@ -183,15 +184,39 @@ namespace ForForeachConverter.Completion
             return result;
         }
 
-        public static EForeach GetExpression(ScintillaControl sci, int position) => new EForeach
+        public static ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition)
         {
-            StartPosition = GetStartOfStatement(sci, position),
-            EndPosition = GetEndOfStatement(sci, position),
-            Variable = GetVarOfForeachStatement(sci, position)
-        };
+            var result = new ASResult();
+            var parCount = 0;
+            var endPosition = sci.TextLength;
+            var pos = startPosition;
+            while (pos < endPosition)
+            {
+                if (!sci.PositionIsOnComment(pos))
+                {
+                    var c = (char) sci.CharAt(pos);
+                    if (c > ' ')
+                    {
+                        if (c == '(') parCount++;
+                        else if (c == ')')
+                        {
+                            parCount--;
+                            if (parCount == 0)
+                            {
+                                result = ASComplete.GetExpressionType(sci, pos);
+                                break;
+                            }
+                        }
+                    }
+                }
+                pos++;
+            }
+            return result;
+        }
 
-        static int GetStartOfBody(ScintillaControl sci, int startPosition)
+        public static int GetStartOfBody(ScintillaControl sci, int startPosition)
         {
+            var result = -1;
             var parCount = 0;
             var pos = startPosition;
             var endPosition = sci.TextLength;
@@ -204,13 +229,26 @@ namespace ForForeachConverter.Completion
                     else if (c == ')')
                     {
                         parCount--;
-                        if (parCount == 0) break;
+                        if (parCount == 0)
+                        {
+                            result = pos + 1;
+                            break;
+                        }
                     }
                 }
                 pos++;
             }
-            return pos;
+            return result;
         }
+
+        public static EForeach GetExpression(ScintillaControl sci, int position) => new EForeach
+        {
+            StartPosition = GetStartOfStatement(sci, position),
+            EndPosition = GetEndOfStatement(sci, position),
+            Variable = GetVarOfForeachStatement(sci, position),
+            Collection = GetCollectionOfForeachStatement(sci, position),
+            BodyPosition = GetStartOfBody(sci, position)
+        };
 
         public struct EForeach
         {
@@ -218,7 +256,34 @@ namespace ForForeachConverter.Completion
             public int EndPosition;
             public ASResult Variable;
             public ASResult Collection;
-            public string[] Statements;
+            public int BodyPosition;
+
+            public bool Equals(EForeach other)
+            {
+                return StartPosition == other.StartPosition && EndPosition == other.EndPosition &&
+                       Variable.Member.Equals(other.Variable.Member) &&
+                       Collection.Member.Equals(other.Collection.Member) &&
+                       BodyPosition == other.BodyPosition;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                return obj is EForeach && Equals((EForeach) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hashCode = StartPosition;
+                    hashCode = (hashCode * 397) ^ EndPosition;
+                    hashCode = (hashCode * 397) ^ Variable.Member.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Collection.Member.GetHashCode();
+                    hashCode = (hashCode * 397) ^ BodyPosition;
+                    return hashCode;
+                }
+            }
         }
     }
 }

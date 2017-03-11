@@ -1,17 +1,20 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 using ASCompletion;
 using ASCompletion.Completion;
 using ASCompletion.Context;
 using ASCompletion.Model;
 using ASCompletion.Settings;
 using FlashDevelop;
+using FlashDevelop.Managers;
 using ForForeachConverter.TestUtils;
 using NSubstitute;
-using NSubstitute.Core;
 using NUnit.Framework;
 using PluginCore;
 using PluginCore.Helpers;
@@ -43,10 +46,10 @@ namespace ForForeachConverter.Completion
             mainForm.CurrentDocument = doc;
             mainForm.StandaloneMode = true;
             PluginBase.Initialize(mainForm);
-            FlashDevelop.Managers.ScintillaManager.LoadConfiguration();
+            ScintillaManager.LoadConfiguration();
             var pluginMain = Substitute.For<ASCompletion.PluginMain>();
             var pluginUI = new PluginUI(pluginMain);
-            pluginMain.MenuItems.Returns(new List<System.Windows.Forms.ToolStripItem>());
+            pluginMain.MenuItems.Returns(new List<ToolStripItem>());
             pluginMain.Settings.Returns(new GeneralSettings());
             pluginMain.Panel.Returns(pluginUI);
             #region ASContext.GlobalInit(pluginMain);
@@ -71,7 +74,7 @@ namespace ForForeachConverter.Completion
         {
             return new ScintillaControl
             {
-                Encoding = System.Text.Encoding.UTF8,
+                Encoding = Encoding.UTF8,
                 CodePage = 65001,
                 Indent = settings.IndentSize,
                 Lexer = 3,
@@ -114,6 +117,34 @@ namespace ForForeachConverter.Completion
                 sci.Text = sourceText;
                 SnippetHelper.PostProcessSnippets(sci, 0);
                 return Complete.GetStartOfStatement(sci, sci.CurrentPos);
+            }
+        }
+
+        [TestFixture]
+        public class GetStartOfBodyTests : CompleteTests
+        {
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get
+                {
+                    yield return new TestCaseData("$(EntryPoint)for each(var it:* in {}) {}").Returns("for each(var it:* in {})".Length);
+                }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public int AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static int ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                return Common(sourceText, sci);
+            }
+
+            static int Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                return Complete.GetStartOfBody(sci, sci.CurrentPos);
             }
         }
 
@@ -280,9 +311,104 @@ namespace ForForeachConverter.Completion
         }
 
         [TestFixture]
+        public class GetCollectionOfForeachStatementTests : CompleteTests
+        {
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get
+                {
+                    yield return
+                        new TestCaseData("var a:Array = [1,2,3];\n$(EntryPoint)for each(var it:Number in a){}").Returns(new MemberModel
+                        {
+                            Name = "a",
+                            Flags = FlagType.Dynamic | FlagType.Variable,
+                            Type = "Array"
+                        });
+                }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public MemberModel AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static MemberModel ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                ASContext.Context.SetAS3Features();
+                return Common(sourceText, sci);
+            }
+
+            static MemberModel Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                var currentModel = ASContext.Context.CurrentModel;
+                new ASFileParser().ParseSrc(currentModel, sci.Text);
+                var currentClass = currentModel.Classes.FirstOrDefault() ?? ClassModel.VoidClass;
+                ASContext.Context.CurrentClass.Returns(currentClass);
+                ASContext.Context.CurrentMember.Returns(currentClass.Members.Items.FirstOrDefault());
+                var result = Complete.GetCollectionOfForeachStatement(sci, sci.CurrentPos);
+                return result.Member;
+            }
+        }
+
+        [TestFixture]
         public class GetExpressionTests : CompleteTests
         {
-            
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get
+                {
+                    yield return
+                        new TestCaseData("var a:Array = [1,2,3];\n$(EntryPoint)for each(var it:Number in a){}")
+                            .Returns(new Complete.EForeach
+                            {
+                                StartPosition = "var a:Array = [1,2,3];\n".Length,
+                                EndPosition = "var a:Array = [1,2,3];\nfor each(var it:Number in a){}".Length,
+                                BodyPosition = "var a:Array = [1,2,3];\nfor each(var it:Number in a)".Length,
+                                Variable = new ASResult
+                                {
+                                    Member = new MemberModel
+                                    {
+                                        Name = "it",
+                                        Flags = FlagType.Dynamic | FlagType.Variable,
+                                        Type = "Number"
+                                    }
+                                },
+                                Collection = new ASResult
+                                {
+                                    Member = new MemberModel
+                                    {
+                                        Name = "a",
+                                        Flags = FlagType.Dynamic | FlagType.Variable,
+                                        Type = "Array"
+                                    }
+                                }
+                            });
+                }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public Complete.EForeach AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static Complete.EForeach ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                ASContext.Context.SetAS3Features();
+                return Common(sourceText, sci);
+            }
+
+            static Complete.EForeach Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                var currentModel = ASContext.Context.CurrentModel;
+                new ASFileParser().ParseSrc(currentModel, sci.Text);
+                var currentClass = currentModel.Classes.FirstOrDefault() ?? ClassModel.VoidClass;
+                ASContext.Context.CurrentClass.Returns(currentClass);
+                ASContext.Context.CurrentMember.Returns(currentClass.Members.Items.FirstOrDefault());
+                var result = Complete.GetExpression(sci, sci.CurrentPos);
+                return result;
+            }
         }
 
         internal static string ReadAllTextAS3(string fileName)
