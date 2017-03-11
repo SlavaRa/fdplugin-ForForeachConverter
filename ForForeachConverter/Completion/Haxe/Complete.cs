@@ -1,6 +1,4 @@
-using System;
 using ASCompletion.Completion;
-using ForForeachConverter.Helpers;
 using ScintillaNet;
 
 namespace ForForeachConverter.Completion.Haxe
