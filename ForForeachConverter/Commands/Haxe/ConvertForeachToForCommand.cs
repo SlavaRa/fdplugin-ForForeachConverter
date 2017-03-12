@@ -1,20 +1,17 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-using System.Collections.Generic;
 using ASCompletion.Completion;
 using ASCompletion.Context;
-using CodeRefactor.Commands;
 using ForForeachConverter.Completion;
 using ForForeachConverter.Helpers;
-using PluginCore.FRService;
 using ScintillaNet;
 
 namespace ForForeachConverter.Commands.Haxe
 {
-    internal class ConvertForeachToForCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
+    internal class ConvertForeachToForCommand : AS3.ConvertForeachToForCommand
     {
-        public static bool IsValidForConvert(ScintillaControl sci)
+        public new static bool IsValidForConvert(ScintillaControl sci)
         {
             var expr = Complete.GetExpression(sci, sci.CurrentPos);
             if (expr.IsNull()) return false;
@@ -45,10 +42,23 @@ namespace ForForeachConverter.Commands.Haxe
                 && Reflector.ASGenerator.CleanType(type) == "List";
         }
 
-        public override bool IsValid() => true;
-
-        protected override void ExecutionImplementation()
+        protected override string GetSnippetFor(ScintillaControl sci, EForeach expr)
         {
+            var result = Reflector.SnippetManager.GetSnippet("for", sci.ConfigurationLanguage, sci.Encoding);
+            result = TemplateUtils.ReplaceTemplateVariable(result, "EntryPoint", $" in 0...{expr.Collection.Member.Name}.length");
+            return result;
+        }
+
+        protected override string GetSnippetVar(ScintillaControl sci, EForeach expr)
+        {
+            var result = TemplateUtils.GetTemplate("AssignVariable");
+            result = TemplateUtils.ReplaceTemplateVariable(result, "Name", expr.Variable.Context.Value);
+            result = TemplateUtils.ReplaceTemplateVariable(result, "Type", expr.Collection.Type.IndexType ?? string.Empty);
+            result = TemplateUtils.ReplaceTemplateVariable(result, "EntryPoint", string.Empty);
+            var context = (ASComplete.CurrentResolvedContext.Result ?? new ASResult()).Context;
+            var iterator = ASComplete.FindFreeIterator(ASContext.Context, ASContext.Context.CurrentClass, context);
+            result += $"{expr.Collection.Member.Name}[{iterator}];";
+            return result;
         }
     }
 }
