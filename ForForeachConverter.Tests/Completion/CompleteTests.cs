@@ -307,7 +307,7 @@ namespace ForForeachConverter.Completion
         }
 
         [TestFixture]
-        public class GetStartOfIFStatementTests : CompleteTests
+        public class GetStartOfIfStatementTests : CompleteTests
         {
             public IEnumerable<TestCaseData> AS3TestCases
             {
@@ -393,7 +393,7 @@ namespace ForForeachConverter.Completion
             {
                 sci.Text = sourceText;
                 SnippetHelper.PostProcessSnippets(sci, 0);
-                return Complete.GetStartOfIFStatement(sci, sci.CurrentPos);
+                return Complete.GetStartOfIfStatement(sci, sci.CurrentPos);
             }
         }
 

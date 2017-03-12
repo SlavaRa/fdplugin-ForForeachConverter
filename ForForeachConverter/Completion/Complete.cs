@@ -7,54 +7,30 @@ namespace ForForeachConverter.Completion
     public static class Complete
     {
         static readonly IComplete NullComplete = new NullComplete();
-
         static readonly Dictionary<string, IComplete> LanguageToComplete = new Dictionary<string, IComplete>
         {
             {"as3", new AS3.Complete()},
             {"haxe", new Haxe.Complete()}
         };
 
-        public static int GetStartOfStatement(ScintillaControl sci, int startPosition)
+        static IComplete GetComplete(ScintillaControl sci)
         {
             IComplete complete;
             LanguageToComplete.TryGetValue(sci.ConfigurationLanguage, out complete);
-            return (complete ?? NullComplete).GetStartOfStatement(sci, startPosition);
+            return complete ?? NullComplete;
         }
 
-        public static int GetEndOfStatement(ScintillaControl sci, int startPosition)
-        {
-            IComplete complete;
-            LanguageToComplete.TryGetValue(sci.ConfigurationLanguage, out complete);
-            return (complete ?? NullComplete).GetEndOfStatement(sci, startPosition);
-        }
+        public static int GetStartOfStatement(ScintillaControl sci, int startPosition) => GetComplete(sci).GetStartOfStatement(sci, startPosition);
 
-        public static int GetStartOfIFStatement(ScintillaControl sci, int startPosition)
-        {
-            IComplete complete;
-            LanguageToComplete.TryGetValue(sci.ConfigurationLanguage, out complete);
-            return (complete ?? NullComplete).GetStartOfIFStatement(sci, startPosition);
-        }
+        public static int GetEndOfStatement(ScintillaControl sci, int startPosition) => GetComplete(sci).GetEndOfStatement(sci, startPosition);
 
-        public static ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
-        {
-            IComplete complete;
-            LanguageToComplete.TryGetValue(sci.ConfigurationLanguage, out complete);
-            return (complete ?? NullComplete).GetVarOfForeachStatement(sci, startPosition);
-        }
+        public static int GetStartOfIfStatement(ScintillaControl sci, int startPosition) => GetComplete(sci).GetStartOfIfStatement(sci, startPosition);
 
-        public static ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition)
-        {
-            IComplete complete;
-            LanguageToComplete.TryGetValue(sci.ConfigurationLanguage, out complete);
-            return (complete ?? NullComplete).GetCollectionOfForeachStatement(sci, startPosition);
-        }
+        public static ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition) => GetComplete(sci).GetVarOfForeachStatement(sci, startPosition);
 
-        public static int GetStartOfBody(ScintillaControl sci, int startPosition)
-        {
-            IComplete complete;
-            LanguageToComplete.TryGetValue(sci.ConfigurationLanguage, out complete);
-            return (complete ?? NullComplete).GetStartOfBody(sci, startPosition);
-        }
+        public static ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition) => GetComplete(sci).GetCollectionOfForeachStatement(sci, startPosition);
+
+        public static int GetStartOfBody(ScintillaControl sci, int startPosition) => GetComplete(sci).GetStartOfBody(sci, startPosition);
 
         public static EForeach GetExpression(ScintillaControl sci, int position) => new EForeach
         {
@@ -106,7 +82,7 @@ namespace ForForeachConverter.Completion
     {
         int GetStartOfStatement(ScintillaControl sci, int startPosition);
         int GetEndOfStatement(ScintillaControl sci, int startPosition);
-        int GetStartOfIFStatement(ScintillaControl sci, int startPosition);
+        int GetStartOfIfStatement(ScintillaControl sci, int startPosition);
         ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition);
         ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition);
         int GetStartOfBody(ScintillaControl sci, int startPosition);
@@ -116,7 +92,7 @@ namespace ForForeachConverter.Completion
     {
         public int GetStartOfStatement(ScintillaControl sci, int startPosition) => -1;
         public int GetEndOfStatement(ScintillaControl sci, int startPosition) => -1;
-        public int GetStartOfIFStatement(ScintillaControl sci, int startPosition) => -1;
+        public int GetStartOfIfStatement(ScintillaControl sci, int startPosition) => -1;
         public ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition) => new ASResult();
         public ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition) => new ASResult();
         public int GetStartOfBody(ScintillaControl sci, int startPosition) => -1;

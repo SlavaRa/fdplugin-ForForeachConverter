@@ -56,7 +56,7 @@ namespace ForForeachConverter.Completion.AS3
                                 switch (word)
                                 {
                                     case "if":
-                                        return GetStartOfIFStatement(sci, pos + word.Length);
+                                        return GetStartOfIfStatement(sci, pos + word.Length);
                                     case "for":
                                     case "while":
                                     case "switch":
@@ -96,7 +96,7 @@ namespace ForForeachConverter.Completion.AS3
             return -1;
         }
 
-        public virtual int GetStartOfIFStatement(ScintillaControl sci, int startPosition)
+        public virtual int GetStartOfIfStatement(ScintillaControl sci, int startPosition)
         {
             var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
             var endPosition = sci.TextLength;
@@ -136,7 +136,7 @@ namespace ForForeachConverter.Completion.AS3
                                     if (word == "if")
                                     {
                                         pos = sci.WordStartPosition(pos + word.Length, false);
-                                        return GetStartOfIFStatement(sci, pos);
+                                        return GetStartOfIfStatement(sci, pos);
                                     }
                                     break;
                                 }
