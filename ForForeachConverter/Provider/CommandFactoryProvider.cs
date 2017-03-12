@@ -14,8 +14,8 @@ namespace ForForeachConverter.Provider
 
         static CommandFactoryProvider()
         {
-            Register("as3", DefaultFactory);
-            Register("haxe", DefaultFactory);
+            Register("as3", new AS3.CommandFactory());
+            Register("haxe", new Haxe.CommandFactory());
         }
 
         public static void Register(string language, ICommandFactory factory)
@@ -24,10 +24,7 @@ namespace ForForeachConverter.Provider
             LanguageToFactory.Add(language, factory);
         }
 
-        public static bool ContainsLanguage(string language)
-        {
-            return LanguageToFactory.ContainsKey(language);
-        }
+        public static bool ContainsLanguage(string language) => LanguageToFactory.ContainsKey(language);
 
         public static ICommandFactory GetFactoryForCurrentDocument()
         {
@@ -36,15 +33,9 @@ namespace ForForeachConverter.Provider
             return GetFactory(document);
         }
 
-        public static ICommandFactory GetFactory(ITabbedDocument document)
-        {
-            return GetFactory(document.SciControl.ConfigurationLanguage);
-        }
+        public static ICommandFactory GetFactory(ITabbedDocument document) => GetFactory(document.SciControl.ConfigurationLanguage);
 
-        public static ICommandFactory GetFactory(ASResult target)
-        {
-            return GetFactory(target.InFile ?? target.Type.InFile);
-        }
+        public static ICommandFactory GetFactory(ASResult target) => GetFactory(target.InFile ?? target.Type.InFile);
 
         public static ICommandFactory GetFactory(FileModel file)
         {
@@ -52,9 +43,6 @@ namespace ForForeachConverter.Provider
             return GetFactory(language);
         }
 
-        public static ICommandFactory GetFactory(string language)
-        {
-            return LanguageToFactory[language];
-        }
+        public static ICommandFactory GetFactory(string language) => LanguageToFactory[language];
     }
 }

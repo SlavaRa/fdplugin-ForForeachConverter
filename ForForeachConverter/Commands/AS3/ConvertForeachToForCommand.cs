@@ -14,21 +14,27 @@ using ScintillaNet;
 
 namespace ForForeachConverter.Commands.AS3
 {
-    class ConvertForeachToForCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
+    public class ConvertForeachToForCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
     {
         public static bool IsValidForConvert(ScintillaControl sci)
         {
-            var pos = sci.CurrentPos;
-            var word = sci.GetWordFromPosition(pos);
-            if (word == "each") return true;
-            if (word != "for") return false;
-            pos = sci.WordEndPosition(pos, true) + 1;
-            word = sci.GetWordFromPosition(pos);
-            if (word != "each") return false;
-            var expr = Complete.GetExpression(sci, pos);
-            var type = expr.Collection.Member?.Type;
-            if (string.IsNullOrEmpty(type)) return false;
-            return type == ASContext.Context.Features.arrayKey || type.StartsWith("Vector.");
+            var expr = Complete.GetExpression(sci, sci.CurrentPos);
+            if (expr.IsNull()) return false;
+            var collection = expr.Collection;
+            return IsArray(collection) || IsVector(collection);
+        }
+
+        static bool IsArray(ASResult result)
+        {
+            var type = result.Member?.Type;
+            return !string.IsNullOrEmpty(type)
+                && Reflector.ASGenerator.CleanType(type) == Reflector.ASGenerator.CleanType(ASContext.Context.Features.arrayKey);
+        }
+
+        static bool IsVector(ASResult result)
+        {
+            var type = result.Member?.Type;
+            return !string.IsNullOrEmpty(type) && type.StartsWith("Vector.");
         }
 
         public override bool IsValid() => true;
@@ -37,39 +43,38 @@ namespace ForForeachConverter.Commands.AS3
         {
             var sci = PluginBase.MainForm.CurrentDocument.SciControl;
             var expr = Complete.GetExpression(sci, sci.CurrentPos);
+            var snippet = GetSnippet(sci, expr);
             var startPosition = expr.StartPosition;
             sci.SetSel(startPosition, expr.EndPosition);
             sci.ReplaceSel(string.Empty);
-            var snippet = GetSnippet(sci, expr);
             SnippetHelper.InsertSnippetText(sci, startPosition, snippet);
             sci.SetSel(startPosition, startPosition);
         }
 
-        static string GetSnippet(ScintillaControl sci, Complete.EForeach expr)
+        string GetSnippet(ScintillaControl sci, EForeach expr)
         {
-            var template = Reflector.SnippetManager.GetSnippet("for", sci.ConfigurationLanguage, sci.Encoding);
-            template = TemplateUtils.ReplaceTemplateVariable(template, "EntryPoint", $"{expr.Collection.Member.Name}.length");
+            var result = GetSnippetFor(sci, expr);
             var parCount = 0;
             var brCount = 0;
-            for (var i = 0; i < template.Length; i++)
+            for (var i = 0; i < result.Length; i++)
             {
-                var c = template[i];
+                var c = result[i];
                 if (c == '(') parCount++;
                 else if (c == ')') parCount--;
                 else if (parCount == 0 && c == '{') brCount++;
-                else if (brCount == 1 && c == '\n')
+                else if (brCount == 1 && c == '\t')
                 {
                     var body = GetBody(sci, expr);
-                    template = template.Insert(i + 1, body);
+                    result = result.Remove(i, 1).Insert(i, body);
                     break;
                 }
             }
-            return template;
+            return result;
         }
 
-        static string GetBody(ScintillaControl sci, Complete.EForeach expr)
+        string GetBody(ScintillaControl sci, EForeach expr)
         {
-            var body = sci.GetTextRange(expr.BodyPosition, expr.EndPosition);
+            var body = sci.GetTextRange(sci.MBSafePosition(expr.BodyPosition), sci.MBSafePosition(expr.EndPosition)).Trim();
             var indentation = sci.GetLineIndentation(sci.LineFromPosition(expr.StartPosition)) / sci.Indent;
             if (indentation > 0)
             {
@@ -77,20 +82,33 @@ namespace ForForeachConverter.Commands.AS3
                 for (var i = 0; i < indentation; i++) s += '\t';
                 body = body.Replace(s, string.Empty);
             }
-            body = body.Trim();
             body = body.Trim('{', '\r', '\n');
             body = body.TrimEnd('}');
             body = body.TrimEnd('\r', '\n');
-            var member = expr.Variable.Member;
-            var template = TemplateUtils.GetTemplate("AssignVariable");
-            template = TemplateUtils.ReplaceTemplateVariable(template, "Name", member.Name);
-            template = TemplateUtils.ReplaceTemplateVariable(template, "Type", member.Type);
-            template = TemplateUtils.ReplaceTemplateVariable(template, "EntryPoint", string.Empty);
-            var result = ASComplete.CurrentResolvedContext.Result ?? new ASResult();
-            var iterator = ASComplete.FindFreeIterator(ASContext.Context, ASContext.Context.CurrentClass, result.Context);
-            template += $"{expr.Collection.Member.Name}[{iterator}];{sci.NewLineMarker}";
-            body = body.Insert(0, $"{'\t'}{template}");
+            var variable = GetSnippetVar(sci, expr);
+            if (body.TrimStart('\t', ' ').Length > 0) variable += sci.NewLineMarker;
+            body = body.Insert(0, $"{'\t'}{variable}");
             return body;
+        }
+
+        protected virtual string GetSnippetFor(ScintillaControl sci, EForeach expr)
+        {
+            var result = Reflector.SnippetManager.GetSnippet("for", sci.ConfigurationLanguage, sci.Encoding);
+            result = TemplateUtils.ReplaceTemplateVariable(result, "EntryPoint", $"{expr.Collection.Member.Name}.length");
+            return result;
+        }
+
+        protected virtual string GetSnippetVar(ScintillaControl sci, EForeach expr)
+        {
+            var member = expr.Variable.Member;
+            var result = TemplateUtils.GetTemplate("AssignVariable");
+            result = TemplateUtils.ReplaceTemplateVariable(result, "Name", member.Name);
+            result = TemplateUtils.ReplaceTemplateVariable(result, "Type", member.Type);
+            result = TemplateUtils.ReplaceTemplateVariable(result, "EntryPoint", string.Empty);
+            var context = (ASComplete.CurrentResolvedContext.Result ?? new ASResult()).Context;
+            var iterator = ASComplete.FindFreeIterator(ASContext.Context, ASContext.Context.CurrentClass, context);
+            result += $"{expr.Collection.Member.Name}[{iterator}];";
+            return result;
         }
     }
 }

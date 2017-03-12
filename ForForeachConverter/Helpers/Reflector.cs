@@ -17,6 +17,13 @@ namespace ForForeachConverter.Helpers
 
     internal class ASGeneratorReflector
     {
+        internal string CleanType(string type)
+        {
+            var methodInfo = typeof(ASGenerator).GetMethod("CleanType", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);
+            Debug.Assert(methodInfo != null, "methodInfo is null");
+            return (string)methodInfo.Invoke(null, new object[] { type });
+        }
+
         internal int GetEndOfStatement(int startPos, int endPos, ScintillaControl sci)
         {
             var methodInfo = typeof(ASGenerator).GetMethod("GetEndOfStatement", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static);

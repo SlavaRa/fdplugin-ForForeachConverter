@@ -52,14 +52,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AS3\ConvertForeachToForCommand.cs" />
+    <Compile Include="Commands\Haxe\ConvertForeachToForCommand.cs" />
+    <Compile Include="Completion\AS3\Complete.cs" />
     <Compile Include="Completion\Complete.cs" />
+    <Compile Include="Completion\Haxe\Complete.cs" />
     <Compile Include="Controls\RefactorCompletionItem.cs" />
     <Compile Include="Controls\RefactorMenu.cs" />
     <Compile Include="Helpers\Reflector.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\AS3\CommandFactory.cs" />
     <Compile Include="Provider\CommandFactory.cs" />
     <Compile Include="Provider\CommandFactoryProvider.cs" />
+    <Compile Include="Provider\Haxe\CommandFactory.cs" />
     <Compile Include="Provider\ICommandFactory.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>
