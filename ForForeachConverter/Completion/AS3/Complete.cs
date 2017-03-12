@@ -4,9 +4,9 @@ using ScintillaNet;
 
 namespace ForForeachConverter.Completion.AS3
 {
-    public class Complete
+    public class Complete : IComplete
     {
-        public static int GetStartOfStatement(ScintillaControl sci, int startPosition)
+        public virtual int GetStartOfStatement(ScintillaControl sci, int startPosition)
         {
             var result = -1;
             var pos = startPosition;
@@ -24,7 +24,7 @@ namespace ForForeachConverter.Completion.AS3
             return result;
         }
 
-        public static int GetEndOfStatement(ScintillaControl sci, int startPosition)
+        public virtual int GetEndOfStatement(ScintillaControl sci, int startPosition)
         {
             var parCount = 0;
             var parseBody = false;
@@ -96,7 +96,7 @@ namespace ForForeachConverter.Completion.AS3
             return -1;
         }
 
-        public static int GetStartOfIFStatement(ScintillaControl sci, int startPosition)
+        public virtual int GetStartOfIFStatement(ScintillaControl sci, int startPosition)
         {
             var characterClass = ScintillaControl.Configuration.GetLanguage(sci.ConfigurationLanguage).characterclass.Characters;
             var endPosition = sci.TextLength;
@@ -151,7 +151,7 @@ namespace ForForeachConverter.Completion.AS3
             return -1;
         }
 
-        public static ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
+        public virtual ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
         {
             var result = new ASResult();
             var parCount = 0;
@@ -181,7 +181,7 @@ namespace ForForeachConverter.Completion.AS3
             return result;
         }
 
-        public static ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition)
+        public virtual ASResult GetCollectionOfForeachStatement(ScintillaControl sci, int startPosition)
         {
             var result = new ASResult();
             var parCount = 0;
@@ -211,7 +211,7 @@ namespace ForForeachConverter.Completion.AS3
             return result;
         }
 
-        public static int GetStartOfBody(ScintillaControl sci, int startPosition)
+        public virtual int GetStartOfBody(ScintillaControl sci, int startPosition)
         {
             var result = -1;
             var parCount = 0;
@@ -236,51 +236,6 @@ namespace ForForeachConverter.Completion.AS3
                 pos++;
             }
             return result;
-        }
-
-        public static EForeach GetExpression(ScintillaControl sci, int position) => new EForeach
-        {
-            StartPosition = GetStartOfStatement(sci, position),
-            EndPosition = GetEndOfStatement(sci, position),
-            Variable = GetVarOfForeachStatement(sci, position),
-            Collection = GetCollectionOfForeachStatement(sci, position),
-            BodyPosition = GetStartOfBody(sci, position)
-        };
-
-        public struct EForeach
-        {
-            public int StartPosition;
-            public int EndPosition;
-            public ASResult Variable;
-            public ASResult Collection;
-            public int BodyPosition;
-
-            public bool Equals(EForeach other)
-            {
-                return StartPosition == other.StartPosition && EndPosition == other.EndPosition &&
-                       Variable.Member.Equals(other.Variable.Member) &&
-                       Collection.Member.Equals(other.Collection.Member) &&
-                       BodyPosition == other.BodyPosition;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is EForeach && Equals((EForeach) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    var hashCode = StartPosition;
-                    hashCode = (hashCode * 397) ^ EndPosition;
-                    hashCode = (hashCode * 397) ^ Variable.Member.GetHashCode();
-                    hashCode = (hashCode * 397) ^ Collection.Member.GetHashCode();
-                    hashCode = (hashCode * 397) ^ BodyPosition;
-                    return hashCode;
-                }
-            }
         }
     }
 }

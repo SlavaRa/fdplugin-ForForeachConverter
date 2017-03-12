@@ -5,7 +5,7 @@ namespace ForForeachConverter.Completion.Haxe
 {
     public class Complete : AS3.Complete
     {
-        public new static int GetStartOfStatement(ScintillaControl sci, int startPosition)
+        public override int GetStartOfStatement(ScintillaControl sci, int startPosition)
         {
             var result = -1;
             var pos = startPosition;
@@ -49,7 +49,7 @@ namespace ForForeachConverter.Completion.Haxe
             return result;
         }
 
-        public new static ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
+        public new ASResult GetVarOfForeachStatement(ScintillaControl sci, int startPosition)
         {
             var result = new ASResult();
             var parCount = 0;

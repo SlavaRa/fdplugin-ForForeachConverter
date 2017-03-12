@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using ASCompletion.Completion;
 using ASCompletion.Context;
 using CodeRefactor.Commands;
-using ForForeachConverter.Completion.AS3;
+using ForForeachConverter.Completion;
 using ForForeachConverter.Helpers;
 using PluginCore;
 using PluginCore.FRService;
@@ -45,7 +45,7 @@ namespace ForForeachConverter.Commands.AS3
             sci.SetSel(startPosition, startPosition);
         }
 
-        static string GetSnippet(ScintillaControl sci, Complete.EForeach expr)
+        static string GetSnippet(ScintillaControl sci, EForeach expr)
         {
             var template = Reflector.SnippetManager.GetSnippet("for", sci.ConfigurationLanguage, sci.Encoding);
             template = TemplateUtils.ReplaceTemplateVariable(template, "EntryPoint", $"{expr.Collection.Member.Name}.length");
@@ -67,7 +67,7 @@ namespace ForForeachConverter.Commands.AS3
             return template;
         }
 
-        static string GetBody(ScintillaControl sci, Complete.EForeach expr)
+        static string GetBody(ScintillaControl sci, EForeach expr)
         {
             var body = sci.GetTextRange(expr.BodyPosition, expr.EndPosition);
             var indentation = sci.GetLineIndentation(sci.LineFromPosition(expr.StartPosition)) / sci.Indent;

@@ -84,6 +84,10 @@
       <Project>{5b4e9515-994a-4da7-9916-cda8fd874701}</Project>
       <Name>HaXeContext</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ProjectManager\ProjectManager.csproj">
+      <Project>{78101C01-E186-4954-B1DD-DEBB7905FAD8}</Project>
+      <Name>ProjectManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ForForeachConverter\ForForeachConverter.csproj">
       <Project>{d489ff4c-f61a-4184-bec7-0f2686728ed2}</Project>
       <Name>ForForeachConverter</Name>
