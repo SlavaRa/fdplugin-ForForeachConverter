@@ -74,21 +74,21 @@ namespace ForForeachConverter.Commands.AS3
 
         string GetBody(ScintillaControl sci, EForeach expr)
         {
-            var body = sci.GetTextRange(sci.MBSafePosition(expr.BodyPosition), sci.MBSafePosition(expr.EndPosition)).Trim();
+            var result = sci.GetTextRange(sci.MBSafePosition(expr.BodyPosition), sci.MBSafePosition(expr.EndPosition)).Trim();
             var indentation = sci.GetLineIndentation(sci.LineFromPosition(expr.StartPosition)) / sci.Indent;
             if (indentation > 0)
             {
                 var s = string.Empty;
                 for (var i = 0; i < indentation; i++) s += '\t';
-                body = body.Replace(s, string.Empty);
+                result = result.Replace(s, string.Empty);
             }
-            body = body.Trim('{', '\r', '\n');
-            body = body.TrimEnd('}');
-            body = body.TrimEnd('\r', '\n');
+            result = result.Trim('{', '\r', '\n');
+            result = result.TrimEnd('}');
+            result = result.TrimEnd('\r', '\n');
             var variable = GetSnippetVar(sci, expr);
-            if (body.TrimStart('\t', ' ').Length > 0) variable += sci.NewLineMarker;
-            body = body.Insert(0, $"{'\t'}{variable}");
-            return body;
+            if (result.TrimStart('\t', ' ').Length > 0) variable += sci.NewLineMarker;
+            result = result.Insert(0, $"{'\t'}{variable}");
+            return result;
         }
 
         protected virtual string GetSnippetFor(ScintillaControl sci, EForeach expr)
