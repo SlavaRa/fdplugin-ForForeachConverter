@@ -616,6 +616,69 @@ namespace ForForeachConverter.Completion
             }
         }
 
+        [TestFixture]
+        public class ConvertForeachToForCommandTests : CompleteTests
+        {
+            public IEnumerable<TestCaseData> AS3TestCases
+            {
+                get
+                {
+                    yield return new TestCaseData("var c:Array = [1,2,3];\n$(EntryPoint)for each(var it:Number in c){}").Returns(true);
+                    yield return new TestCaseData("var c:Array = [1,2,3];\nfor$(EntryPoint) each(var it:Number in c){}").Returns(true);
+                    yield return new TestCaseData("var c:Array = [1,2,3];\nfor ea$(EntryPoint)ch(var it:Number in c){}").Returns(true);
+                    yield return new TestCaseData("var c:Vector.<int> = new <int>[1,2,3];\n$(EntryPoint)for each(var it:int in c){}").Returns(true);
+                    yield return new TestCaseData("$(EntryPoint)var c:Array = [1,2,3];\nfor each(var it:Number in c){}").Returns(false);
+                    yield return new TestCaseData("var c:Array = [1,2,3];\n$(EntryPoint)for(var i:int = 0; i < c.length; i++){}").Returns(false);
+                    yield return new TestCaseData("var c:Object = {};\n$(EntryPoint)for each(var it:int in c){}").Returns(false);
+                    yield return new TestCaseData("var c:Dictionary = new Dictionary();\n$(EntryPoint)for each(var it:int in c){}").Returns(false);
+                }
+            }
+
+            [Test, TestCaseSource(nameof(AS3TestCases))]
+            public bool AS3(string sourceText) => ImplAS3(sourceText, Sci);
+
+            static bool ImplAS3(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "as3";
+                ASContext.Context.SetAS3Features();
+                return Common(sourceText, sci);
+            }
+
+            public IEnumerable<TestCaseData> HaxeTestCases
+            {
+                get
+                {
+                    yield return new TestCaseData("var c:Array<Int> = [1,2,3];\n$(EntryPoint)for(it in c){}").Returns(true);
+                    yield return new TestCaseData("var c:haxe.ds.Vector<Int> = new haxe.ds.Vector(1);\n$(EntryPoint)for(i in c){}").Returns(true);
+                    yield return new TestCaseData("var c:List<Int> = new List<Int>();\n$(EntryPoint)for(i in c){}").Returns(true);
+                    yield return new TestCaseData("var c:Array<Int> = [1,2,3];\n$(EntryPoint)for(i in 0...c.length){}").Returns(false);
+                    yield return new TestCaseData("var c:Map<String, Int> = ['1' => 1];\n$(EntryPoint)for(i in c){}").Returns(false);
+                }
+            }
+
+            [Test, TestCaseSource(nameof(HaxeTestCases))]
+            public bool Haxe(string sourceText) => ImplHaxe(sourceText, Sci);
+
+            static bool ImplHaxe(string sourceText, ScintillaControl sci)
+            {
+                sci.ConfigurationLanguage = "haxe";
+                ASContext.Context.SetHaxeFeatures();
+                return Common(sourceText, sci);
+            }
+
+            static bool Common(string sourceText, ScintillaControl sci)
+            {
+                sci.Text = sourceText;
+                SnippetHelper.PostProcessSnippets(sci, 0);
+                var currentModel = ASContext.Context.CurrentModel;
+                new ASFileParser().ParseSrc(currentModel, sci.Text);
+                var currentClass = currentModel.Classes.FirstOrDefault() ?? ClassModel.VoidClass;
+                ASContext.Context.CurrentClass.Returns(currentClass);
+                ASContext.Context.CurrentMember.Returns(currentClass.Members.Items.FirstOrDefault());
+                return Provider.CommandFactoryProvider.GetFactory(sci.ConfigurationLanguage).IsValidForConvertForeachToFor(sci);
+            }
+        }
+
         internal static string ReadAllTextAS3(string fileName)
         {
             return TestFile.ReadAllText($"{nameof(ForForeachConverter)}.Test_Files.completion.as3.{fileName}");

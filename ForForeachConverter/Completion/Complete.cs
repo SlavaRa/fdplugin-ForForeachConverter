@@ -32,14 +32,25 @@ namespace ForForeachConverter.Completion
 
         public static int GetStartOfBody(ScintillaControl sci, int startPosition) => GetComplete(sci).GetStartOfBody(sci, startPosition);
 
-        public static EForeach GetExpression(ScintillaControl sci, int position) => new EForeach
+        public static EForeach GetExpression(ScintillaControl sci, int position)
         {
-            StartPosition = GetStartOfStatement(sci, position),
-            EndPosition = GetEndOfStatement(sci, position),
-            Variable = GetVarOfForeachStatement(sci, position),
-            Collection = GetCollectionOfForeachStatement(sci, position),
-            BodyPosition = GetStartOfBody(sci, position)
-        };
+            var result = new EForeach(-1, -1, null, null, -1);
+            var startPosition = GetStartOfStatement(sci, position);
+            if (startPosition != -1)
+            {
+                result.StartPosition = startPosition;
+                result.EndPosition = GetEndOfStatement(sci, position);
+                result.Variable = GetVarOfForeachStatement(sci, position);
+                result.Collection = GetCollectionOfForeachStatement(sci, position);
+                result.BodyPosition = GetStartOfBody(sci, position);
+            }
+            else
+            {
+                result.Variable = new ASResult();
+                result.Collection = new ASResult();
+            }
+            return result;
+        }
     }
 
     public struct EForeach
@@ -49,6 +60,17 @@ namespace ForForeachConverter.Completion
         public ASResult Variable;
         public ASResult Collection;
         public int BodyPosition;
+
+        public EForeach(int startPosition, int endPosition, ASResult variable, ASResult collection, int bodyPosition)
+        {
+            StartPosition = startPosition;
+            EndPosition = endPosition;
+            Variable = variable;
+            Collection = collection;
+            BodyPosition = bodyPosition;
+        }
+
+        public bool IsNull() => StartPosition == -1 || EndPosition == -1 || BodyPosition == -1 || Variable == null || Collection == null;
 
         public bool Equals(EForeach other)
         {

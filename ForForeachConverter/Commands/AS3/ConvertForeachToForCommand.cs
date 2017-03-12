@@ -14,21 +14,14 @@ using ScintillaNet;
 
 namespace ForForeachConverter.Commands.AS3
 {
-    class ConvertForeachToForCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
+    public class ConvertForeachToForCommand : RefactorCommand<IDictionary<string, List<SearchMatch>>>
     {
         public static bool IsValidForConvert(ScintillaControl sci)
         {
-            var pos = sci.CurrentPos;
-            var word = sci.GetWordFromPosition(pos);
-            if (word == "each") return true;
-            if (word != "for") return false;
-            pos = sci.WordEndPosition(pos, true) + 1;
-            word = sci.GetWordFromPosition(pos);
-            if (word != "each") return false;
-            var expr = Complete.GetExpression(sci, pos);
+            var expr = Complete.GetExpression(sci, sci.CurrentPos);
+            if (expr.IsNull()) return false;
             var type = expr.Collection.Member?.Type;
-            if (string.IsNullOrEmpty(type)) return false;
-            return type == ASContext.Context.Features.arrayKey || type.StartsWith("Vector.");
+            return !string.IsNullOrEmpty(type) && (type == ASContext.Context.Features.arrayKey || type.StartsWith("Vector."));
         }
 
         public override bool IsValid() => true;
