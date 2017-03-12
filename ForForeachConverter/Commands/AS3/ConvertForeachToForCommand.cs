@@ -64,8 +64,7 @@ namespace ForForeachConverter.Commands.AS3
                 else if (parCount == 0 && c == '{') brCount++;
                 else if (brCount == 1 && c == '\t')
                 {
-                    var body = GetBody(sci, expr);
-                    result = result.Remove(i, 1).Insert(i, body);
+                    result = InsertBody(result, i, GetBody(sci, expr));
                     break;
                 }
             }
@@ -110,5 +109,7 @@ namespace ForForeachConverter.Commands.AS3
             result += $"{expr.Collection.Member.Name}[{iterator}];";
             return result;
         }
+
+        protected virtual string InsertBody(string snippet, int position, string body) => snippet.Remove(position, 1).Insert(position, body);
     }
 }

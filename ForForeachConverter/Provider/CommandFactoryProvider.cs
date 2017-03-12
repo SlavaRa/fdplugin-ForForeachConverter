@@ -9,7 +9,7 @@ namespace ForForeachConverter.Provider
 {
     public static class CommandFactoryProvider
     {
-        public static readonly ICommandFactory DefaultFactory = new CommandFactory();
+        public static readonly ICommandFactory DefaultFactory = new NullCommandFactory();
         static readonly Dictionary<string, ICommandFactory> LanguageToFactory = new Dictionary<string, ICommandFactory>();
 
         static CommandFactoryProvider()

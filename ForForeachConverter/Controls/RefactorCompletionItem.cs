@@ -15,7 +15,7 @@ namespace ForForeachConverter.Controls
         {
             this.item = item;
             Label = TextHelper.RemoveMnemonicsAndEllipsis(item.Text);
-            Description = TextHelper.GetStringWithoutMnemonics("Label.Refactor");
+            Description = TextHelper.GetStringWithoutMnemonics("CodeRefactor.Label.Refactor");
             Icon = (Bitmap) (item.Image ?? PluginBase.MainForm.FindImage("452")); //452 or 473
         }
 

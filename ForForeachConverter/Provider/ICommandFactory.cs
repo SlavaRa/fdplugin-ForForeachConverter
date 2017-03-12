@@ -11,7 +11,9 @@ namespace ForForeachConverter.Provider
 
     public interface ICommandFactory
     {
-        Command CreateConvertForeachToForCommand();
         bool IsValidForConvertForeachToFor(ScintillaControl sci);
+        bool IsValidForConvertForeachToForin(ScintillaControl sci);
+        Command CreateConvertForeachToForCommand();
+        Command CreateConvertForeachToForinCommand();
     }
 }

@@ -94,6 +94,7 @@ namespace ForForeachConverter
         {
             refactorMainMenu = new RefactorMenu();
             refactorMainMenu.ConvertForeachToFor.Click += ConvertForeachToForOnClick;
+            refactorMainMenu.ConvertForeachToForin.Click += ConvertForeachToForinOnClick;
             CompletionMenuProvider.Menu = refactorMainMenu;
         }
 
@@ -124,6 +125,20 @@ namespace ForForeachConverter
                 ErrorManager.ShowError(e);
             }
         }
+
+        void ConvertForeachToForinOnClick(object sender, EventArgs eventArgs)
+        {
+            try
+            {
+                CommandFactoryProvider.GetFactoryForCurrentDocument()
+                    .CreateConvertForeachToForinCommand()
+                    .Execute();
+            }
+            catch (Exception e)
+            {
+                ErrorManager.ShowError(e);
+            }
+        }
     }
 
     class CompletionMenuProvider
@@ -135,6 +150,7 @@ namespace ForForeachConverter
             var result = new List<ICompletionListItem>();
             var factory = CommandFactoryProvider.GetFactoryForCurrentDocument();
             if (factory.IsValidForConvertForeachToFor(sci)) result.Add(new RefactorCompletionItem(Menu.ConvertForeachToFor));
+            if (factory.IsValidForConvertForeachToForin(sci)) result.Add(new RefactorCompletionItem(Menu.ConvertForeachToForin));
             return result;
         }
     }

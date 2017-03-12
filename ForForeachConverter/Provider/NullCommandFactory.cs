@@ -9,10 +9,11 @@ namespace ForForeachConverter.Provider
 {
     using Command = RefactorCommand<IDictionary<string, List<SearchMatch>>>;
 
-    class CommandFactory : ICommandFactory
+    class NullCommandFactory : ICommandFactory
     {
         public bool IsValidForConvertForeachToFor(ScintillaControl sci) => false;
-
+        public bool IsValidForConvertForeachToForin(ScintillaControl sci) => false;
         public Command CreateConvertForeachToForCommand() => null;
+        public Command CreateConvertForeachToForinCommand() => null;
     }
 }
