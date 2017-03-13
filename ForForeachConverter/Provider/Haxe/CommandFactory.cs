@@ -2,7 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 using System.Collections.Generic;
 using CodeRefactor.Commands;
-using ForForeachConverter.Commands.AS3;
+using ForForeachConverter.Commands.Haxe;
 using PluginCore.FRService;
 using ScintillaNet;
 
@@ -13,8 +13,8 @@ namespace ForForeachConverter.Provider.Haxe
     class CommandFactory : ICommandFactory
     {
         public bool IsValidForConvertForeachToFor(ScintillaControl sci) => ConvertForeachToForCommand.IsValidForConvert(sci);
-        public bool IsValidForConvertForeachToForin(ScintillaControl sci) => false;
+        public bool IsValidForConvertForeachToKeyValueIterator(ScintillaControl sci) => ConvertForeachToKeyValueIteratorCommand.IsValidForConvert(sci);
         public Command CreateConvertForeachToForCommand() => new ConvertForeachToForCommand();
-        public Command CreateConvertForeachToForinCommand() => new ConvertForeachToForinCommand();
+        public Command CreateConvertForeachToKeyValueIteratorCommand() => new ConvertForeachToKeyValueIteratorCommand();
     }
 }

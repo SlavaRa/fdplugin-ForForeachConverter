@@ -94,7 +94,7 @@ namespace ForForeachConverter
         {
             refactorMainMenu = new RefactorMenu();
             refactorMainMenu.ConvertForeachToFor.Click += ConvertForeachToForOnClick;
-            refactorMainMenu.ConvertForeachToForin.Click += ConvertForeachToForinOnClick;
+            refactorMainMenu.ConvertForeachToKeyValueIterator.Click += ConvertForeachToKeyValueIteratorOnClick;
             CompletionMenuProvider.Menu = refactorMainMenu;
         }
 
@@ -126,12 +126,12 @@ namespace ForForeachConverter
             }
         }
 
-        void ConvertForeachToForinOnClick(object sender, EventArgs eventArgs)
+        static void ConvertForeachToKeyValueIteratorOnClick(object sender, EventArgs eventArgs)
         {
             try
             {
                 CommandFactoryProvider.GetFactoryForCurrentDocument()
-                    .CreateConvertForeachToForinCommand()
+                    .CreateConvertForeachToKeyValueIteratorCommand()
                     .Execute();
             }
             catch (Exception e)
@@ -150,7 +150,12 @@ namespace ForForeachConverter
             var result = new List<ICompletionListItem>();
             var factory = CommandFactoryProvider.GetFactoryForCurrentDocument();
             if (factory.IsValidForConvertForeachToFor(sci)) result.Add(new RefactorCompletionItem(Menu.ConvertForeachToFor));
-            if (factory.IsValidForConvertForeachToForin(sci)) result.Add(new RefactorCompletionItem(Menu.ConvertForeachToForin));
+            if (factory.IsValidForConvertForeachToKeyValueIterator(sci))
+            {
+                //FIXME slavara:
+                Menu.ConvertForeachToKeyValueIterator.Text = sci.ConfigurationLanguage == "haxe" ? "To key-value iterator" : "To for..in";
+                result.Add(new RefactorCompletionItem(Menu.ConvertForeachToKeyValueIterator));
+            }
             return result;
         }
     }

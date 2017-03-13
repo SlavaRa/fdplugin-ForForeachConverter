@@ -12,8 +12,8 @@ namespace ForForeachConverter.Provider
     class NullCommandFactory : ICommandFactory
     {
         public bool IsValidForConvertForeachToFor(ScintillaControl sci) => false;
-        public bool IsValidForConvertForeachToForin(ScintillaControl sci) => false;
+        public bool IsValidForConvertForeachToKeyValueIterator(ScintillaControl sci) => false;
         public Command CreateConvertForeachToForCommand() => null;
-        public Command CreateConvertForeachToForinCommand() => null;
+        public Command CreateConvertForeachToKeyValueIteratorCommand() => null;
     }
 }

@@ -680,7 +680,7 @@ namespace ForForeachConverter.Completion
         }
 
         [TestFixture]
-        public class ConvertForeachToForinCommandTests : CompleteTests
+        public class ConvertForeachToKeyValueIteratorCommandTests : CompleteTests
         {
             public IEnumerable<TestCaseData> AS3TestCases
             {
@@ -711,15 +711,16 @@ namespace ForForeachConverter.Completion
             {
                 get
                 {
-                    yield return new TestCaseData("var c:Array<Int> = [1,2,3];\n$(EntryPoint)for(it in c){}").Returns(true);
-                    yield return new TestCaseData("var c:haxe.ds.Vector<Int> = new haxe.ds.Vector(1);\n$(EntryPoint)for(i in c){}").Returns(true);
-                    yield return new TestCaseData("var c:List<Int> = new List<Int>();\n$(EntryPoint)for(i in c){}").Returns(true);
+                    yield return new TestCaseData("var c:Array<Int> = [1,2,3];\n$(EntryPoint)for(it in c){}").Returns(false);
+                    yield return new TestCaseData("var c:haxe.ds.Vector<Int> = new haxe.ds.Vector(1);\n$(EntryPoint)for(i in c){}").Returns(false);
+                    yield return new TestCaseData("var c:List<Int> = new List<Int>();\n$(EntryPoint)for(i in c){}").Returns(false);
                     yield return new TestCaseData("var c:Array<Int> = [1,2,3];\n$(EntryPoint)for(i in 0...c.length){}").Returns(false);
-                    yield return new TestCaseData("var c:Map<String, Int> = ['1' => 1];\n$(EntryPoint)for(i in c){}").Returns(false);
+                    yield return new TestCaseData("var c:Map<String, Int> = ['1' => 1];\n$(EntryPoint)for(i in c){}").Returns(true);
+                    yield return new TestCaseData("var c:haxe.Constraints.IMap<String, Int> = ['1' => 1];\n$(EntryPoint)for(i in c){}").Returns(true);
+                    yield return new TestCaseData("import haxe.Constraints;\nvar c:IMap<String, Int> = ['1' => 1];\n$(EntryPoint)for(i in c){}").Returns(true);
                 }
             }
 
-            [Ignore]
             [Test, TestCaseSource(nameof(HaxeTestCases))]
             public bool Haxe(string sourceText) => ImplHaxe(sourceText, Sci);
 
@@ -739,7 +740,7 @@ namespace ForForeachConverter.Completion
                 var currentClass = currentModel.Classes.FirstOrDefault() ?? ClassModel.VoidClass;
                 ASContext.Context.CurrentClass.Returns(currentClass);
                 ASContext.Context.CurrentMember.Returns(currentClass.Members.Items.FirstOrDefault());
-                return Provider.CommandFactoryProvider.GetFactory(sci.ConfigurationLanguage).IsValidForConvertForeachToForin(sci);
+                return Provider.CommandFactoryProvider.GetFactory(sci.ConfigurationLanguage).IsValidForConvertForeachToKeyValueIterator(sci);
             }
         }
 

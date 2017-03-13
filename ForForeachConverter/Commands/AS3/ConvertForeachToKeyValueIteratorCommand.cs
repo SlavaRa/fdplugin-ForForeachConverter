@@ -9,7 +9,7 @@ using ScintillaNet;
 
 namespace ForForeachConverter.Commands.AS3
 {
-    class ConvertForeachToForinCommand : ConvertForeachToForCommand
+    class ConvertForeachToKeyValueIteratorCommand : ConvertForeachToForCommand
     {
         public new static bool IsValidForConvert(ScintillaControl sci)
         {
@@ -48,7 +48,7 @@ namespace ForForeachConverter.Commands.AS3
             result = TemplateUtils.ReplaceTemplateVariable(result, "Name", member.Name);
             result = TemplateUtils.ReplaceTemplateVariable(result, "Type", member.Type);
             result = TemplateUtils.ReplaceTemplateVariable(result, "EntryPoint", string.Empty);
-            result += $"{expr.Collection.Member.Name}[name];";
+            result += $"{expr.Collection.Member.Name}[key];";
             return result;
         }
 

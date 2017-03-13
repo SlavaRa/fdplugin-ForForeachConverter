@@ -9,12 +9,12 @@ namespace ForForeachConverter.Controls
         public RefactorMenu()
         {
             ConvertForeachToFor = new ToolStripMenuItem("To for");
-            ConvertForeachToForin = new ToolStripMenuItem("To forin");
+            ConvertForeachToKeyValueIterator = new ToolStripMenuItem("To forin");
             ConvertToForeach = new ToolStripMenuItem("To foreach");
         }
 
         public ToolStripMenuItem ConvertForeachToFor { get; private set; }
-        public ToolStripMenuItem ConvertForeachToForin { get; private set; }
+        public ToolStripMenuItem ConvertForeachToKeyValueIterator { get; private set; }
         public ToolStripMenuItem ConvertToForeach { private set; get; }
     }
 }

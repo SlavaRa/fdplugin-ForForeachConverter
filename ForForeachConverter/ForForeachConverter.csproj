@@ -52,9 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AS3\ConvertForeachToForCommand.cs" />
-    <Compile Include="Commands\AS3\ConvertForeachToForinCommand.cs" />
+    <Compile Include="Commands\AS3\ConvertForeachToKeyValueIteratorCommand.cs" />
     <Compile Include="Commands\Haxe\ConvertForeachToForCommand.cs" />
-    <Compile Include="Commands\Haxe\ConvertForeachToForinCommand.cs" />
+    <Compile Include="Commands\Haxe\ConvertForeachToKeyValueIteratorCommand.cs" />
     <Compile Include="Completion\AS3\Complete.cs" />
     <Compile Include="Completion\Complete.cs" />
     <Compile Include="Completion\Haxe\Complete.cs" />

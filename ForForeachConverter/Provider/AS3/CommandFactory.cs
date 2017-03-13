@@ -13,8 +13,8 @@ namespace ForForeachConverter.Provider.AS3
     class CommandFactory : ICommandFactory
     {
         public bool IsValidForConvertForeachToFor(ScintillaControl sci) => ConvertForeachToForCommand.IsValidForConvert(sci);
-        public bool IsValidForConvertForeachToForin(ScintillaControl sci) => ConvertForeachToForinCommand.IsValidForConvert(sci);
+        public bool IsValidForConvertForeachToKeyValueIterator(ScintillaControl sci) => ConvertForeachToKeyValueIteratorCommand.IsValidForConvert(sci);
         public Command CreateConvertForeachToForCommand() => new ConvertForeachToForCommand();
-        public Command CreateConvertForeachToForinCommand() => new ConvertForeachToForinCommand();
+        public Command CreateConvertForeachToKeyValueIteratorCommand() => new ConvertForeachToKeyValueIteratorCommand();
     }
 }
