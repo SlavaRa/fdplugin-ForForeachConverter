@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C41F6870-EDAF-4175-8C64-A67259C9BB35}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ForForeachConverter</RootNamespace>
+    <AssemblyName>ForForeachConverter.Tests</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\FlashDevelop\Bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NSubstitute">
+      <HintPath>..\..\..\..\packages\NSubstitute.1.10.0.0\lib\net35\NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Completion\CompleteTests.cs" />
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PluginUIMock.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestUtils\ContextExtensions.cs" />
+    <Compile Include="TestUtils\TestFile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\FlashDevelop\FlashDevelop.csproj">
+      <Project>{efd07485-9a64-4eec-94e7-acbd4da5ca93}</Project>
+      <Name>FlashDevelop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\PluginCore\PluginCore.csproj">
+      <Project>{61885F70-B4DC-4B44-852D-5D6D03F2A734}</Project>
+      <Name>PluginCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AS2Context\AS2Context.csproj">
+      <Project>{74ad0487-cef9-43fe-9283-bc6f79539ade}</Project>
+      <Name>AS2Context</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AS3Context\AS3Context.csproj">
+      <Project>{0263e5f6-d5b2-4118-b12e-87f9a74de8af}</Project>
+      <Name>AS3Context</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ASCompletion\ASCompletion.csproj">
+      <Project>{4EBF2653-9654-4E40-880E-0046B3D6210E}</Project>
+      <Name>ASCompletion</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CodeRefactor\CodeRefactor.csproj">
+      <Project>{1F6DF858-6011-4CAC-B33E-7000EE90FFBE}</Project>
+      <Name>CodeRefactor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\HaXeContext\HaXeContext.csproj">
+      <Project>{5b4e9515-994a-4da7-9916-cda8fd874701}</Project>
+      <Name>HaXeContext</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProjectManager\ProjectManager.csproj">
+      <Project>{78101C01-E186-4954-B1DD-DEBB7905FAD8}</Project>
+      <Name>ProjectManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ForForeachConverter\ForForeachConverter.csproj">
+      <Project>{d489ff4c-f61a-4184-bec7-0f2686728ed2}</Project>
+      <Name>ForForeachConverter</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
